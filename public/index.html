@@ -11,6 +11,7 @@
 
 	<script src="assets/components/jquery/dist/jquery.min.js"></script>
 	<script src="assets/components/bson/browser_build/bson.js"></script>
+	<script src="assets/components/svg-injector/dist/svg-injector.min.js"></script>
 	<script src="assets/main.js"></script>
 </head>
 <body>
@@ -20,20 +21,24 @@
 
 	<div class="container-fluid">
 		<div class="row">
-			<div class="col-md-6">
-				<div id="direction-input" class="joystick">
-					<div class="handle"></div>
-				</div>
-
-				<div class="text-center" style="width: 300px;margin-left:auto;">
+			<div class="col-md-3">
+				<div class="text-center">
 					<div class="switch">
 						<input type="checkbox" id="switch-test">
 						<label for="switch-test"></label>
 					</div>
 				</div>
 			</div>
-			<div class="col-md-6">
-				<input type="range" id="power-input" orient="vertical">
+			<div class="col-md-3">
+				<div id="direction-input" class="joystick">
+					<div class="handle"></div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<input type="range" id="power-input" orient="vertical" step="5" min="0" max="100">
+			</div>
+			<div class="col-md-3">
+				<img src="assets/quadcopter.svg" alt="" id="quadcopter">
 			</div>
 		</div>
 	</div>
