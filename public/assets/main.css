@@ -1,12 +1,20 @@
 body {
-	font-family: 'Andale Mono', Consolas, 'Courier New';
 	background: #141414;
 	color: rgba(211, 211, 211, 0.5);
+}
+
+pre {
+	background: none;
+	border: none;
+	color: inherit;
 }
 
 #console {
 	height: 200px;
 	overflow: auto;
+}
+#console .error {
+	color: rgb(120, 0, 0);
 }
 
 .joystick {
@@ -65,7 +73,7 @@ body {
 .switch input[type="checkbox"] + label {
 	height: 16px;
 	width: 32px;
-	background-image: radial-gradient(16px at 50% 50%, rgb(58, 0, 0) 0%, rgb(58, 0, 0) 49%, transparent 50%);
+	background-image: radial-gradient(16px at 50% 50%, rgb(100, 0, 0) 0%, rgb(100, 0, 0) 49%, transparent 50%);
 	background-size: 16px 16px;
 	background-repeat: no-repeat;
 	background-position: left center;
@@ -81,7 +89,7 @@ body {
 	width: 32px;
 	height: 5px;
 	margin-top: 5px;
-	background-color: rgb(58, 0, 0);
+	background-color: rgb(100, 0, 0);
 	border-radius: 3px;
 }
 .switch input[type="checkbox"]:checked + label:before {
