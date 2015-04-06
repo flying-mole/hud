@@ -14,10 +14,10 @@ pre {
 	overflow: auto;
 }
 #console .error {
-	color: rgb(120, 0, 0);
+	color: rgb(180, 0, 0);
 }
 #console .info {
-	color: rgb(0, 0, 120);
+	color: rgb(0, 100, 200);
 }
 
 .joystick {

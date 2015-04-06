@@ -45,6 +45,11 @@ app.ws('/socket', function (ws, req) {
 	});
 
 	send({
+		type: 'info',
+		msg: 'Flying Mole 0.1.0 - welcome dear mole!'
+	});
+
+	send({
 		type: 'motors-speed',
 		speed: [0, 0, 0, 0]
 	});
