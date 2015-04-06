@@ -155,7 +155,10 @@ $(function () {
 	// Console
 	var $console = $('#console pre');
 
-	function log(msg) {
+	function log(msg, type) {
+		if (type) {
+			msg = '<span class="'+type+'">'+msg+'</span>';
+		}
 		$console.append(msg, '\n');
 	}
 
@@ -163,10 +166,10 @@ $(function () {
 	var handlers = {};
 
 	handlers.error = function (event) {
-		log('<span class="error">'+event.msg+'</span>');
+		log(event.msg, 'error');
 	};
 	handlers.info = function (event) {
-		log('<span class="info">'+event.msg+'</span>');
+		log(event.msg, 'info');
 	};
 
 	handlers['motors-speed'] = function (event) {
@@ -196,6 +199,15 @@ $(function () {
 		ws.addEventListener('open', function () {
 			log('Connection opened.');
 			init();
+		});
+
+		ws.addEventListener('error', function (event) {
+			console.error(error);
+			log('Connection error!', 'error');
+		});
+
+		ws.addEventListener('close', function () {
+			log('Connection closed.', 'info');
 		});
 
 		ws.addEventListener('message', function (event) {
