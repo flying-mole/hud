@@ -49,6 +49,13 @@ app.ws('/socket', function (ws, req) {
 		speed: [0, 0, 0, 0]
 	});
 
+	send({
+		type: 'orientation',
+		alpha: 0, // compass direction the device is facing in degrees
+		beta: 0, // front-to-back tilt in degrees, where front is positive
+		gamma: 0 // left-to-right tilt in degrees, where right is positive
+	});
+
 	ws.on('close', function () {
 		clients.splice(clients.indexOf(ws), 1);
 	});

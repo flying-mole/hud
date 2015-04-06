@@ -2,29 +2,43 @@ var BSON = bson().BSON;
 var ws;
 
 var percentColors = [
-    { pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
-    { pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
-    { pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
+	{ pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
+	{ pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
+	{ pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
 
 var getColorForPercentage = function(pct) {
-    for (var i = 1; i < percentColors.length - 1; i++) {
-        if (pct < percentColors[i].pct) {
-            break;
-        }
-    }
-    var lower = percentColors[i - 1];
-    var upper = percentColors[i];
-    var range = upper.pct - lower.pct;
-    var rangePct = (pct - lower.pct) / range;
-    var pctLower = 1 - rangePct;
-    var pctUpper = rangePct;
-    var color = {
-        r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
-        g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
-        b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
-    };
-    return color;
+	for (var i = 1; i < percentColors.length - 1; i++) {
+		if (pct < percentColors[i].pct) {
+			break;
+		}
+	}
+	var lower = percentColors[i - 1];
+	var upper = percentColors[i];
+	var range = upper.pct - lower.pct;
+	var rangePct = (pct - lower.pct) / range;
+	var pctLower = 1 - rangePct;
+	var pctUpper = rangePct;
+	var color = {
+		r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
+		g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
+		b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
+	};
+	return color;
 }
+
+/**
+ * @see http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
+ */
+var shadeColor = function (color, p) {
+	var t = (p < 0) ? 0 : 255,
+		p = (p < 0) ? p*-1 : p;
+
+	return {
+		r: Math.round((t-color.r)*p)+color.r,
+		g: Math.round((t-color.g)*p)+color.g,
+		b: Math.round((t-color.b)*p)+color.b
+	};
+};
 
 function Joystick(el, oninput) {
 	var that = this;
@@ -61,6 +75,7 @@ function Joystick(el, oninput) {
 				top: y
 			});
 
+			// TODO: return angle
 			oninput([(x - joystickSize.width/2) / joystickSize.width,
 				(y - joystickSize.height/2) / joystickSize.height]);
 		} else {
@@ -79,20 +94,35 @@ function Joystick(el, oninput) {
 	this.joystick.trigger('mouseup');
 }
 
+function DeviceOrientationJoystick(oninput) {
+	if (!window.DeviceOrientationEvent) {
+		throw new Error('DeviceOrientation not supported');
+	}
+
+	window.addEventListener('deviceorientation', function (event) {
+		var tiltFB = eventData.beta, // front-to-back tilt in degrees, where front is positive
+			tiltLR = eventData.gamma; // left-to-right tilt in degrees, where right is positive
+
+		oninput([tiltFB, tiltLR]);
+	}, false);
+}
+
 function QuadcopterSchema(svg) {
 	this.svg = $(svg);
 }
 QuadcopterSchema.prototype.setSpeed = function (speed) {
-	var colorOffset = -150;
 	var propellers = this.svg.find('#propellers > g');
 
 	for (var i = 0; i < speed.length; i++) {
 		var s = speed[i];
-		var color = getColorForPercentage(1 - s);
+		var color = shadeColor(getColorForPercentage(1 - s), -0.5);
 
-		var rgb = 'rgb(' + [color.r+colorOffset, color.g+colorOffset, color.b+colorOffset].join(',') + ')';
+		var rgb = 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
 		$(propellers[i]).css('fill', rgb);
 	}
+};
+QuadcopterSchema.prototype.setRotation = function (rot) {
+	this.svg.css('transform', 'rotate('+rot+'deg)');
 };
 
 function sendCommand(cmd, opts) {
@@ -120,13 +150,7 @@ function init() {
 }
 
 $(function () {
-	var quadMotors;
-
-	// Inject SVGs
-	var svgs = $('img[src$=".svg"]');
-	SVGInjector(svgs, null, function () {
-		quadMotors = new QuadcopterSchema('#quadcopter');
-	});
+	var schemas = {};
 
 	// Console
 	var $console = $('#console pre');
@@ -146,28 +170,43 @@ $(function () {
 	};
 
 	handlers['motors-speed'] = function (event) {
-		quadMotors.setSpeed(event.speed);
+		schemas.top.setSpeed(event.speed);
+		schemas.sideX.setSpeed(event.speed.slice(0, 2));
+		schemas.sideY.setSpeed(event.speed.slice(2, 4));
 	};
 
-	// Init
-	log('Connecting to server...');
+	handlers.orientation = function (event) {
+		schemas.sideX.setRotation(event.beta);
+		schemas.sideY.setRotation(event.gamma);
+	};
 
-	ws = new WebSocket('ws://'+window.location.host+'/socket');
-	ws.binaryType = 'arraybuffer';
+	// Inject SVGs
+	var svgs = $('img[src$=".svg"]');
+	SVGInjector(svgs, null, function () {
+		schemas.top = new QuadcopterSchema('#quadcopter-top');
+		schemas.sideX = new QuadcopterSchema('#quadcopter-side-x');
+		schemas.sideY = new QuadcopterSchema('#quadcopter-side-y');
 
-	ws.addEventListener('open', function () {
-		log('Connection opened.');
-		init();
-	});
+		// Init
+		log('Connecting to server...');
 
-	ws.addEventListener('message', function (event) {
-		var msg = BSON.deserialize(new Uint8Array(event.data));
-		
-		if (!handlers[msg.type]) {
-			console.error('Unsupported message type: "'+msg.type+'"');
-			return;
-		}
+		ws = new WebSocket('ws://'+window.location.host+'/socket');
+		ws.binaryType = 'arraybuffer';
 
-		handlers[msg.type](msg);
+		ws.addEventListener('open', function () {
+			log('Connection opened.');
+			init();
+		});
+
+		ws.addEventListener('message', function (event) {
+			var msg = BSON.deserialize(new Uint8Array(event.data));
+			
+			if (!handlers[msg.type]) {
+				console.error('Unsupported message type: "'+msg.type+'"');
+				return;
+			}
+
+			handlers[msg.type](msg);
+		});
 	});
 });

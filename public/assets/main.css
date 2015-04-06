@@ -105,8 +105,19 @@ pre {
 	border-radius: 3px;
 }
 
-#quadcopter {
+.quadcopter-schema {
+	fill: rgb(58, 58, 58);
+	transition: 0.3s transform;
+}
+.quadcopter-schema g {
+	transition: 0.3s fill;
+}
+#quadcopter-top {
 	width: 300px;
 	height: 300px;
-	fill: rgb(58, 58, 58);
+}
+.quadcopter-side {
+	width: 300px;
+	height: 75px;
+	margin: 37px 0;
 }
