@@ -99,17 +99,21 @@ function Joystick(el, oninput) {
 }
 
 function DeviceOrientationJoystick(oninput) {
-	if (!window.DeviceOrientationEvent) {
+	if (!DeviceOrientationJoystick.isSupported()) {
 		throw new Error('DeviceOrientation not supported');
 	}
 
 	window.addEventListener('deviceorientation', function (event) {
-		var tiltFB = eventData.beta, // front-to-back tilt in degrees, where front is positive
-			tiltLR = eventData.gamma; // left-to-right tilt in degrees, where right is positive
-
-		oninput([tiltFB, tiltLR]);
+		oninput({
+			alpha: event.alpha,
+			beta: event.beta, // front-to-back tilt in degrees, where front is positive
+			gamma: event.gamma // left-to-right tilt in degrees, where right is positive
+		});
 	}, false);
 }
+DeviceOrientationJoystick.isSupported = function () {
+	return (typeof window.DeviceOrientationEvent != 'undefined');
+};
 
 function QuadcopterSchema(svg) {
 	this.svg = $(svg);
@@ -135,9 +139,18 @@ function sendCommand(cmd, opts) {
 }
 
 function init() {
-	var joystick = Joystick('#direction-input', function (pos) {
+	var joystick = new Joystick('#direction-input', function (pos) {
 		sendCommand('direction', pos);
 	});
+
+	if (DeviceOrientationJoystick.isSupported()) {
+		var $switch = $('#orientation-switch');
+		var devOrientation = new DeviceOrientationJoystick(function (data) {
+			if ($switch.prop('checked')) {
+				sendCommand('orientation', data);
+			}
+		});
+	}
 
 	var lastPower;
 	$('#power-input').on('input', function () {
@@ -181,8 +194,8 @@ $(function () {
 	};
 
 	handlers.orientation = function (event) {
-		schemas.sideX.setRotation(event.beta);
-		schemas.sideY.setRotation(event.gamma);
+		schemas.sideX.setRotation(event.data.rotation.x);
+		schemas.sideY.setRotation(event.data.rotation.y);
 	};
 
 	handlers['os-stats'] = function (event) {

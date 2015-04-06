@@ -1,0 +1,20 @@
+{
+	"mpu6050": {
+		"device": 1,
+		"address": "0x68"
+	},
+	"servos": {
+		"pins": [0, 1, 2, 3]
+	},
+	"broadcastInterval": {
+		"osStatus": 10,
+		"orientation": 1
+	},
+	"pid": {
+		"interval": 100,
+		"values": {
+			"x": [0.25, 0.01, 0.01],
+			"y": [0.25, 0.01, 0.01]
+		}
+	}
+}

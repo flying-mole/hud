@@ -49,6 +49,7 @@ pre {
 	height: 300px;
 	margin: auto;
 	border: 10px solid transparent;
+	background: none;
 }
 #power-input::-moz-range-track {
 	width: 5px;
