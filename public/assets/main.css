@@ -24,7 +24,7 @@ pre {
 	position: relative;
 	width: 300px;
 	height: 300px;
-	margin-left: auto;
+	margin: auto;
 	border: 5px solid rgba(211, 211, 211, 0.2);
 	border-radius: 50%;
 }
@@ -44,9 +44,9 @@ pre {
 
 /* @see http://brennaobrien.com/blog/2014/05/style-input-type-range-in-every-browser.html */
 #power-input {
-	width: 300px;
+	width: 100px;
 	height: 300px;
-	margin-right: auto;
+	margin: auto;
 	border: 10px solid transparent;
 }
 #power-input::-moz-range-track {
