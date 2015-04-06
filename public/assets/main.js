@@ -40,6 +40,10 @@ var shadeColor = function (color, p) {
 	};
 };
 
+var colorToRgb = function (color) {
+	return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
+};
+
 function Joystick(el, oninput) {
 	var that = this;
 
@@ -116,9 +120,7 @@ QuadcopterSchema.prototype.setSpeed = function (speed) {
 	for (var i = 0; i < speed.length; i++) {
 		var s = speed[i];
 		var color = shadeColor(getColorForPercentage(1 - s), -0.5);
-
-		var rgb = 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
-		$(propellers[i]).css('fill', rgb);
+		$(propellers[i]).css('fill', colorToRgb(color));
 	}
 };
 QuadcopterSchema.prototype.setRotation = function (rot) {
@@ -181,6 +183,23 @@ $(function () {
 	handlers.orientation = function (event) {
 		schemas.sideX.setRotation(event.beta);
 		schemas.sideY.setRotation(event.gamma);
+	};
+
+	handlers['os-stats'] = function (event) {
+		var $stats = $('#os-stats');
+
+		var loadavg = [];
+		for (var i = 0; i < event.loadavg.length; i++) {
+			var avg = event.loadavg[i];
+			var pct = Math.round(avg * 100);
+			loadavg.push('<span style="color: '+colorToRgb(shadeColor(getColorForPercentage(1 - avg), -0.5))+';">'+pct+'%</span>');
+		}
+		$stats.find('.os-loadavg').html(loadavg.join(', '));
+
+		var memPct = event.mem.free / event.mem.total;
+		$stats.find('.os-mem')
+			.text(event.mem.free + '/' + event.mem.total + ' ('+Math.round(memPct * 100)+'%)')
+			.css('color', colorToRgb(shadeColor(getColorForPercentage(1 - memPct), -0.5)));
 	};
 
 	// Inject SVGs
