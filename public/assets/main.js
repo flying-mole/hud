@@ -71,17 +71,20 @@ function Joystick(el, oninput) {
 				offset = that.joystick.offset();
 			}
 
-			var x = event.clientX - offset.left - handleSize.width/2,
-				y = event.clientY - offset.top - handleSize.height/2;
+			var x = event.pageX - offset.left - handleSize.width/2,
+				y = event.pageY - offset.top - handleSize.height/2;
 
 			that.handle.css({
 				left: x,
 				top: y
 			});
 
-			// TODO: return angle
-			oninput([(x - joystickSize.width/2) / joystickSize.width,
-				(y - joystickSize.height/2) / joystickSize.height]);
+			// In degrees
+			oninput({
+				alpha: 0,
+				beta: (x - joystickSize.width/2) / joystickSize.width * 90, // front-to-back tilt in degrees, where front is positive
+				gamma: (y - joystickSize.height/2) / joystickSize.height * 90 // left-to-right tilt in degrees, where right is positive
+			});
 		} else {
 			if (that.pressed) {
 				that.joystick.removeClass('active');
@@ -91,7 +94,11 @@ function Joystick(el, oninput) {
 				});
 				that.pressed = false;
 
-				oninput([0, 0]);
+				oninput({
+					alpha: 0,
+					beta: 0,
+					gamma: 0
+				});
 			}
 		}
 	});
@@ -139,8 +146,14 @@ function sendCommand(cmd, opts) {
 }
 
 function init() {
-	var joystick = new Joystick('#direction-input', function (pos) {
-		sendCommand('direction', pos);
+	var joystick = new Joystick('#direction-input', function (data) {
+		//sendCommand('orientation', data);
+		//TODO
+		sendCommand('rotation-speed', {
+			x: data.beta,
+			y: data.gamma,
+			z: data.alpha
+		});
 	});
 
 	if (DeviceOrientationJoystick.isSupported()) {
@@ -196,6 +209,20 @@ $(function () {
 	handlers.orientation = function (event) {
 		schemas.sideX.setRotation(event.data.rotation.x);
 		schemas.sideY.setRotation(event.data.rotation.y);
+
+		var objectValues = function (obj) {
+			var list = [];
+			for (var key in obj) {
+				list.push(obj[key]);
+			}
+			return list;
+		};
+
+		var $stats = $('#sensor-stats');
+		$stats.find('.sensor-gyro').text(objectValues(event.data.gyro));
+		$stats.find('.sensor-accel').text(objectValues(event.data.accel));
+		$stats.find('.sensor-rotation').text(objectValues(event.data.rotation));
+		$stats.find('.sensor-temp').text(event.data.temp);
 	};
 
 	handlers['os-stats'] = function (event) {

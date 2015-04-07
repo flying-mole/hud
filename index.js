@@ -25,12 +25,17 @@ try {
 var servo = servoblaster.createWriteStream();
 
 // PID
-var xVal = config.pid.values.x,
-	yVal = config.pid.values.y;
-var ctrl = {
-	x: new PidController(xVal[0], xVal[1], xVal[2]),
-	y: new PidController(yVal[0], yVal[1], yVal[2])
-};
+var ctrlTypes = ['rate', 'stabilize'];
+var ctrlAxis = ['x', 'y', 'z'];
+var ctrl = {};
+ctrlTypes.forEach(function (type) {
+	ctrl[type] = {};
+	ctrlAxis.forEach(function (axis) {
+		var cst = config.pid.values[type][axis];
+		ctrl[type][axis] = new PidController(cst[0], cst[1], cst[2]);
+		ctrl[type][axis].setTarget(0);
+	});
+});
 
 // Websockets
 var clients = [];
@@ -58,50 +63,81 @@ function getOsStats() {
 	};
 }
 
-var orientation = null;
+var orientation = null, power = 0, motorsSpeed = null;
+var lastCmdTime = null;
 function readOrientation(done) {
-	if (!mpu6050) {
-		return done('MPU6050 not available');
-	}
-
-	mpu6050.read(function (err, data) {
+	var gotData = function (err, data) {
 		if (err) return done(err);
 
 		orientation = data;
 
 		// Corrections
-		var x = ctrl.x.update(data.rotation.x);
-		var y = ctrl.y.update(data.rotation.y);
-		
-		// TODO: update servos
-		console.log('UPDATE orientation', x, y);
-
-		done(null);
-	});
-}
-
-function readOrientationVirtual(done) { // FAKE
-	setTimeout(function () {
-		var rot = {
-			x: ctrl.x.target + Math.random() * 10,
-			y: ctrl.y.target + Math.random() * 10
+		var delta = {
+			/*stabilize: {
+				x: ctrl.stabilize.x.update(data.rotation.x),
+				y: ctrl.stabilize.y.update(data.rotation.y)
+			},*/
+			rate: {
+				x: ctrl.rate.x.update(data.gyro.x),
+				y: ctrl.rate.y.update(data.gyro.y),
+				z: ctrl.rate.z.update(data.gyro.z)
+			}
 		};
 
-		orientation = { rotation: rot };
+		console.log('UPDATE orientation', delta);
 
-		// Corrections
-		var x = ctrl.x.update(rot.x);
-		var y = ctrl.y.update(rot.y);
+		// Update motors speed
+		var speeds = [
+			power + delta.rate.x,
+			power + delta.rate.y,
+			power - delta.rate.x,
+			power - delta.rate.y
+		];
 
-		// TODO: update servos
-		console.log('UPDATE orientation', x, y);
+		config.servos.pins.forEach(function (pin, i) {
+			servo.write({ pin: pin, value: speeds[i] });
+		});
+
+		motorsSpeed = speeds.map(function (speed) { return speed / 200; });
 
 		done(null);
-	}, 20);
+	};
+
+	if (!mpu6050) {
+		//return done('MPU6050 not available');
+
+		// Return fake data
+		setTimeout(function () {
+			var dt = 0;
+			if (lastCmdTime === null) {
+				dt = lastCmdTime - new Date().getTime();
+			}
+
+			var orientation = getOrientation().data;
+
+			gotData(null, {
+				gyro: {
+					x: ctrl.rate.x.target - dt * (orientation.gyro.x - ctrl.rate.x.target) * 0.1,
+					y: ctrl.rate.y.target - dt * (orientation.gyro.y - ctrl.rate.y.target) * 0.1,
+					z: ctrl.rate.z.target - dt * (orientation.gyro.z - ctrl.rate.z.target) * 0.1
+				},
+				accel: { x: 0, y: 0, z: 0 },
+				rotation: {
+					x: ctrl.stabilize.x.target,
+					y: ctrl.stabilize.y.target,
+					z: ctrl.stabilize.z.target
+				},
+				temp: 0
+			});
+		}, 20);
+		return;
+	}
+
+	mpu6050.read(gotData);
 }
 
 function ctrlLoop() {
-	readOrientationVirtual(function (err) {
+	readOrientation(function (err) {
 		if (err) console.error(err);
 
 		setTimeout(function () {
@@ -114,28 +150,42 @@ function getOrientation() {
 	return {
 		type: 'orientation',
 		data: orientation || {
-			rotation: { x: 0, y: 0 }
+			gyro: { x: 0, y: 0, z: 0 },
+			accel: { x: 0, y: 0, z: 0 },
+			rotation: { x: 0, y: 0 },
+			temp: 0
 		}
+	};
+}
+
+function getMotorsSpeed() {
+	return {
+		type: 'motors-speed',
+		speed: motorsSpeed || [0, 0, 0, 0]
 	};
 }
 
 // Command handlers
 var handlers = {
 	power: function (val) {
-		var pwmVal = Math.round(val * 200);
-		console.log('SET power:', pwmVal);
-		servo.write({ pin: config.servos.pins[0], value: pwmVal });
-
-		broadcast({
-			type: 'motors-speed',
-			speed: [val, 0, 0, 0]
-		});
+		power = Math.round(val * 200);
+		console.log('SET power:', power);
 	},
 	orientation: function (data) {
-		ctrl.x.setTarget(data.beta);
-		ctrl.y.setTarget(data.gamma);
+		// TODO: stabilize pids
 		// TODO: alpha
-		//console.log('SET orientation:', data);
+		ctrl.stabilize.x.setTarget(data.beta);
+		ctrl.stabilize.y.setTarget(data.gamma);
+
+		console.log('SET orientation:', data);
+	},
+	'rotation-speed': function (data) { // TODO: remove this (just for testing)
+		// Update rotation speed (deg/s)
+		ctrl.rate.x.setTarget(data.x);
+		ctrl.rate.y.setTarget(data.y);
+		ctrl.rate.z.setTarget(data.z);
+		lastCmdTime = new Date().getTime();
+		console.log('SET rotation-speed:', data);
 	}
 };
 
@@ -162,10 +212,7 @@ app.ws('/socket', function (ws, req) {
 
 	// Send init data
 	send(getAppInfo());
-	send({
-		type: 'motors-speed',
-		speed: [0, 0, 0, 0]
-	});
+	send(getMotorsSpeed());
 	send(getOsStats());
 
 	if (!mpu6050) {
@@ -180,10 +227,6 @@ app.use(express.static(__dirname+'/public'));
 var server = app.listen(process.env.PORT || 3000, function () {
 	console.log('Server listening', server.address());
 
-	// Init PID
-	ctrl.x.setTarget(0);
-	ctrl.y.setTarget(0);
-
 	// Periodically broadcast status
 	setInterval(function () {
 		broadcast(getOsStats());
@@ -191,6 +234,7 @@ var server = app.listen(process.env.PORT || 3000, function () {
 
 	setInterval(function () {
 		broadcast(getOrientation());
+		broadcast(getMotorsSpeed());
 	}, config.broadcastInterval.orientation * 1000);
 
 	// Start PID loop

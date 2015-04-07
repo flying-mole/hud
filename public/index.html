@@ -19,6 +19,28 @@
 		<pre></pre>
 	</div>
 
+	<hr>
+
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-lg-6 col-xs-12">
+				<div class="switch">
+					<input type="checkbox" id="orientation-switch">
+					<label for="orientation-switch"></label>
+				</div>
+				POWER
+			</div>
+			<div class="col-lg-6 col-xs-12">
+				<p id="os-stats">
+					Load average: <span class="os-loadavg"></span><br>
+					Memory: <span class="os-mem"></span>
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<hr>
+
 	<div class="container-fluid">
 		<div class="row">
 			<div class="col-lg-3 col-xs-6 visible-xs visible-sm">
@@ -44,11 +66,11 @@
 			<div class="col-lg-3 col-xs-12 text-center">
 				<img src="assets/quadcopter-side.svg" alt="" class="quadcopter-schema quadcopter-side" id="quadcopter-side-x">
 				<img src="assets/quadcopter-side.svg" alt="" class="quadcopter-schema quadcopter-side" id="quadcopter-side-y">
-			</div>
-			<div class="col-lg-3 col-xs-12">
-				<p id="os-stats">
-					Load average: <span class="os-loadavg"></span><br>
-					Memory: <span class="os-mem"></span>
+				<p id="sensor-stats">
+					Gyro (°/s): <span class="sensor-gyro"></span><br>
+					Accel (g): <span class="sensor-accel"></span><br>
+					Rotation (°): <span class="sensor-rotation"></span><br>
+					Temperature (°C): <span class="sensor-temp"></span>
 				</p>
 			</div>
 		</div>

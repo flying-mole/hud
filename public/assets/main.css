@@ -10,6 +10,10 @@ pre {
 	color: inherit;
 }
 
+hr {
+	border-color: rgba(211, 211, 211, 0.1);
+}
+
 #console {
 	height: 200px;
 	overflow: auto;
@@ -76,8 +80,10 @@ pre {
 	display: none;
 }
 .switch input[type="checkbox"] + label {
+	display: inline-block;
 	height: 16px;
 	width: 32px;
+	margin-bottom: -3px; /* TODO */
 	background-image: radial-gradient(16px at 50% 50%, rgb(100, 0, 0) 0%, rgb(100, 0, 0) 49%, transparent 50%);
 	background-size: 16px 16px;
 	background-repeat: no-repeat;
