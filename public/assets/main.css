@@ -3,15 +3,24 @@ body {
 	font-family: "Ubuntu Mono",Menlo,Monaco,Consolas,"Courier New",monospace;
 	color: rgba(211, 211, 211, 0.5);
 }
-
 pre {
 	background: none;
 	border: none;
 	color: inherit;
 }
-
 hr {
 	border-color: rgba(211, 211, 211, 0.1);
+}
+.btn.btn-default {
+	color: inherit;
+	background-color: rgba(0, 0, 0, 0.2);
+	border-color: rgba(0, 0, 0, 0.3);
+}
+.btn.btn-default:hover {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+.btn.btn-default:active, .btn.btn-default.active {
+	background-color: rgba(0, 0, 0, 0.3);
 }
 
 #console {

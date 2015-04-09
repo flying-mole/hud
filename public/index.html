@@ -25,10 +25,10 @@
 		<div class="row">
 			<div class="col-lg-6 col-xs-12">
 				<div class="switch">
-					<input type="checkbox" id="orientation-switch">
-					<label for="orientation-switch"></label>
+					<input type="checkbox" id="power-switch">
+					<label for="power-switch"></label>
 				</div>
-				POWER
+				<label for="power-switch">POWER</label>
 			</div>
 			<div class="col-lg-6 col-xs-12">
 				<p id="os-stats">
@@ -62,6 +62,10 @@
 			</div>
 			<div class="col-lg-3 col-xs-12 text-center">
 				<img src="assets/quadcopter-top.svg" alt="" class="quadcopter-schema" id="quadcopter-top">
+				<p id="motors-stats">
+					Motors speed (%):<br>
+					<span class="motors-speed"></span>
+				</p>
 			</div>
 			<div class="col-lg-3 col-xs-12 text-center">
 				<img src="assets/quadcopter-side.svg" alt="" class="quadcopter-schema quadcopter-side" id="quadcopter-side-x">
@@ -72,8 +76,11 @@
 					Rotation (°): <span class="sensor-rotation"></span><br>
 					Temperature (°C): <span class="sensor-temp"></span>
 				</p>
+				<button id="calibrate-sensor-btn" class="btn btn-default">Calibrate</button>
 			</div>
 		</div>
 	</div>
+
+	<p></p>
 </body>
 </html>

@@ -41,7 +41,11 @@ ctrlTypes.forEach(function (type) {
 var clients = [];
 function broadcast(msg) {
 	clients.forEach(function (ws) {
-		ws.send(BSON.serialize(msg));
+		try {
+			ws.send(BSON.serialize(msg));
+		} catch (err) {
+			console.error(err);
+		}
 	});
 }
 
@@ -63,13 +67,17 @@ function getOsStats() {
 	};
 }
 
-var orientation = null, power = 0, motorsSpeed = null;
+var orientation = null, enabled = false, power = 0, motorsSpeed = null;
 var lastCmdTime = null;
 function readOrientation(done) {
 	var gotData = function (err, data) {
 		if (err) return done(err);
 
 		orientation = data;
+
+		if (!enabled) {
+			return done(null);
+		}
 
 		// Corrections
 		var delta = {
@@ -184,8 +192,27 @@ var handlers = {
 		ctrl.rate.x.setTarget(data.x);
 		ctrl.rate.y.setTarget(data.y);
 		ctrl.rate.z.setTarget(data.z);
+
 		lastCmdTime = new Date().getTime();
 		console.log('SET rotation-speed:', data);
+	},
+	enable: function (val) {
+		enabled = val;
+
+		if (!val) {
+			// TODO: Reset PIDs, speeds, etc...
+			var nullSpeed = config.servos.range[0];
+			config.servos.pins.forEach(function (pin, i) {
+				servo.write({ pin: pin, value: nullSpeed });
+			});
+			motorsSpeed = [0, 0, 0, 0];
+
+			ctrlTypes.forEach(function (type) {
+				ctrlAxis.forEach(function (axis) {
+					ctrl[type][axis].setTarget(0);
+				});
+			});
+		}
 	}
 };
 

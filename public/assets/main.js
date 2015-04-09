@@ -175,6 +175,10 @@ function init() {
 		lastPower = val;
 		sendCommand('power', val / 100);
 	});
+
+	$('#power-switch').on('change', function () {
+		sendCommand('enable', $(this).prop('checked'));
+	});
 }
 
 $(function () {
@@ -204,6 +208,12 @@ $(function () {
 		schemas.top.setSpeed(event.speed);
 		schemas.sideX.setSpeed(event.speed.slice(0, 2));
 		schemas.sideY.setSpeed(event.speed.slice(2, 4));
+
+		var $stats = $('#motors-stats');
+		var speeds = event.speed.map(function (speed) {
+			return Math.round(speed * 100);
+		}).join('<br>');
+		$stats.find('.motors-speed').html(speeds);
 	};
 
 	handlers.orientation = function (event) {
