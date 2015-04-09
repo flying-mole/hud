@@ -204,6 +204,10 @@ $(function () {
 		log(event.msg, 'info');
 	};
 
+	handlers.enabled = function (event) {
+		$('#power-switch').prop('checked', event.enabled);
+	};
+
 	handlers['motors-speed'] = function (event) {
 		schemas.top.setSpeed(event.speed);
 		schemas.sideX.setSpeed(event.speed.slice(0, 2));

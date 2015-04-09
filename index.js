@@ -67,6 +67,13 @@ function getOsStats() {
 	};
 }
 
+function getConfig() {
+	return {
+		type: 'config',
+		config: config
+	};
+}
+
 var orientation = null, enabled = false, power = 0, motorsSpeed = null;
 var lastCmdTime = null;
 function readOrientation(done) {
@@ -81,10 +88,10 @@ function readOrientation(done) {
 
 		// Corrections
 		var delta = {
-			/*stabilize: {
+			stabilize: {
 				x: ctrl.stabilize.x.update(data.rotation.x),
 				y: ctrl.stabilize.y.update(data.rotation.y)
-			},*/
+			},
 			rate: {
 				x: ctrl.rate.x.update(data.gyro.x),
 				y: ctrl.rate.y.update(data.gyro.y),
@@ -95,6 +102,7 @@ function readOrientation(done) {
 		console.log('UPDATE orientation', delta);
 
 		// Update motors speed
+		// TODO: this is a delta. Update last speed instead of power.
 		var speeds = [
 			power + delta.rate.x,
 			power + delta.rate.y,
@@ -116,18 +124,30 @@ function readOrientation(done) {
 
 		// Return fake data
 		setTimeout(function () {
-			var dt = 0;
-			if (lastCmdTime === null) {
-				dt = lastCmdTime - new Date().getTime();
-			}
-
 			var orientation = getOrientation().data;
+
+			var err = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+			if (lastCmdTime !== null) {
+				var dt = new Date().getTime() - lastCmdTime;
+				dt = 1/dt;
+
+				var factor = 2;
+				err = {
+					x: dt * (orientation.gyro.x - ctrl.rate.x.target) * factor,
+					y: dt * (orientation.gyro.y - ctrl.rate.y.target) * factor,
+					z: dt * (orientation.gyro.z - ctrl.rate.z.target) * factor
+				};
+			}
 
 			gotData(null, {
 				gyro: {
-					x: ctrl.rate.x.target - dt * (orientation.gyro.x - ctrl.rate.x.target) * 0.1,
-					y: ctrl.rate.y.target - dt * (orientation.gyro.y - ctrl.rate.y.target) * 0.1,
-					z: ctrl.rate.z.target - dt * (orientation.gyro.z - ctrl.rate.z.target) * 0.1
+					x: ctrl.rate.x.target - err.x,
+					y: ctrl.rate.y.target - err.y,
+					z: ctrl.rate.z.target - err.z
 				},
 				accel: { x: 0, y: 0, z: 0 },
 				rotation: {
@@ -173,6 +193,13 @@ function getMotorsSpeed() {
 	};
 }
 
+function getEnabled() {
+	return {
+		type: 'enabled',
+		enabled: enabled
+	};
+}
+
 // Command handlers
 var handlers = {
 	power: function (val) {
@@ -209,10 +236,19 @@ var handlers = {
 
 			ctrlTypes.forEach(function (type) {
 				ctrlAxis.forEach(function (axis) {
-					ctrl[type][axis].setTarget(0);
+					var c = ctrl[type][axis];
+					c.setTarget(0);
+					c.sumError = 0;
+					c.lastError = 0;
+					c.lastTime = 0;
 				});
 			});
 		}
+	},
+	config: function (data) {
+		config = data;
+		// TODO: propagate config changes
+		console.info('Config updated.');
 	}
 };
 
@@ -238,9 +274,11 @@ app.ws('/socket', function (ws, req) {
 	});
 
 	// Send init data
+	send(getEnabled());
 	send(getAppInfo());
 	send(getMotorsSpeed());
 	send(getOsStats());
+	send(getConfig());
 
 	if (!mpu6050) {
 		send({ type: 'error', msg: 'MPU6050 not available' });
