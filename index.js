@@ -1,4 +1,5 @@
-var Quadcopter = require('./quadcopter');
+var Quadcopter = require('./lib/quadcopter');
+var config = require('./config');
 
-var quad = new Quadcopter();
+var quad = new Quadcopter(config);
 quad.start();
