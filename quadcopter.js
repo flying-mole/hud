@@ -4,6 +4,8 @@ var Controller = require('./controller');
 var loadSensors = require('./sensors');
 var config = require('./config');
 
+var lastCmdTime = null;
+
 function Quadcopter() {
 	var props = {
 		enabled: false,
@@ -11,6 +13,8 @@ function Quadcopter() {
 		motorsSpeed: null
 	};
 	this._props = props;
+
+	var that = this;
 
 	Object.defineProperties(this, {
 		enabled: {
@@ -57,6 +61,12 @@ function Quadcopter() {
 			},
 			set: function (val) {
 				props.rotationSpeed = val;
+
+				that.ctrl.rate.x.setTarget(val.x);
+				that.ctrl.rate.y.setTarget(val.y);
+				that.ctrl.rate.z.setTarget(val.z);
+
+				lastCmdTime = new Date().getTime();
 			}
 		},
 		motorsSpeed: {
@@ -95,7 +105,6 @@ Quadcopter.prototype.start = function (done) {
 	});
 };
 
-var lastCmdTime = null;
 Quadcopter.prototype._readOrientation = function (done) {
 	if (!this.sensors.mpu6050) {
 		//return done('MPU6050 not available');
