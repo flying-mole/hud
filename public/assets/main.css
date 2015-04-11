@@ -11,8 +11,10 @@ pre {
 hr {
 	border-color: rgba(211, 211, 211, 0.1);
 }
-.btn.btn-default {
+.btn, .btn:hover, .btn:active, .btn.active {
 	color: inherit;
+}
+.btn.btn-default {
 	background-color: rgba(0, 0, 0, 0.2);
 	border-color: rgba(0, 0, 0, 0.3);
 }
@@ -21,6 +23,35 @@ hr {
 }
 .btn.btn-default:active, .btn.btn-default.active {
 	background-color: rgba(0, 0, 0, 0.3);
+}
+.btn.btn-primary {
+	background-color: rgba(0, 100, 200, 0.2);
+	border-color: rgba(0, 0, 0, 0.3);
+}
+.btn.btn-primary:hover {
+	background-color: rgba(0, 100, 200, 0.3);
+}
+.btn.btn-primary:active, .btn.btn-primary.active {
+	background-color: rgba(0, 100, 200, 0.3);
+}
+
+.form-control {
+	background: none;
+	box-shadow: none;
+	border: none;
+	border-radius: 0;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+}
+.form-control:focus {
+	box-shadow: none;
+	border-bottom-color: rgba(0, 100, 200, 0.3);
+}
+input[type="number"].form-control {
+	-moz-appearance: textfield;
+}
+
+.form-inline input[type="number"].form-control {
+	width: 65px;
 }
 
 #console {

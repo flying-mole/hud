@@ -208,6 +208,10 @@ $(function () {
 		$('#power-switch').prop('checked', event.enabled);
 	};
 
+	handlers.power = function (event) {
+		$('#power-input').val(event.power * 100);
+	};
+
 	handlers['motors-speed'] = function (event) {
 		schemas.top.setSpeed(event.speed);
 		schemas.sideX.setSpeed(event.speed.slice(0, 2));
@@ -254,6 +258,59 @@ $(function () {
 		$stats.find('.os-mem')
 			.text(event.mem.free + '/' + event.mem.total + ' ('+Math.round(memPct * 100)+'%)')
 			.css('color', colorToRgb(shadeColor(getColorForPercentage(1 - memPct), -0.5)));
+	};
+
+	handlers.config = function (event) {
+		var cfg = event.config;
+
+		var accessor = function (prop, value) {
+			var path = prop.split('.');
+
+			var obj = cfg;
+			for (var i = 0; i < path.length; i++) {
+				var node = path[i];
+				if (obj instanceof Array) {
+					node = parseInt(node);
+				}
+
+				if (typeof obj[node] == 'undefined') {
+					return;
+				}
+
+				if (i == path.length - 1) { // Last one
+					if (typeof value == 'undefined') {
+						return obj[node];
+					} else {
+						obj[node] = value;
+					}
+				} else {
+					obj = obj[node];
+				}
+			}
+		};
+
+		var $form = $('#config-form');
+		$form.find('input').each(function (i, input) {
+			var name = $(input).attr('name');
+			if (!name) {
+				return;
+			}
+
+			$(input).val(accessor(name));
+
+			$(input).change(function () {
+				var val = $(input).val();
+				accessor(name, val);
+			});
+		});
+		$form.submit(function (event) {
+			event.preventDefault();
+
+			sendCommand('config', cfg);
+		});
+		$form.find('#export-config-btn').click(function () {
+			var json = JSON.stringify(cfg, null, '\t');
+		});
 	};
 
 	// Inject SVGs
