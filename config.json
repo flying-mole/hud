@@ -1,11 +1,18 @@
 {
+	"physics": {
+		"gravity": 9.81,
+		"mass": 750,
+		"diagonalLength": 100
+	},
 	"mpu6050": {
 		"device": 1,
-		"address": "0x68"
+		"address": "0x68",
+		"calibration": {}
 	},
 	"servos": {
 		"pins": [0, 2, 1, 3],
-		"range": [85, 185]
+		"range": [85, 140, 185],
+		"massToPeriod": [91.344803622, 0.0676439999, 0.0000557704991374891]
 	},
 	"broadcastInterval": {
 		"osStatus": 10,

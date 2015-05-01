@@ -145,7 +145,7 @@ function sendCommand(cmd, opts) {
 	}));
 }
 
-function init() {
+function init(quad) {
 	var joystick = new Joystick('#direction-input', function (data) {
 		//sendCommand('orientation', data);
 		//TODO
@@ -179,10 +179,26 @@ function init() {
 	$('#power-switch').on('change', function () {
 		sendCommand('enable', $(this).prop('checked'));
 	});
+
+	// TODO: not working properly with rotation
+	$('#calibrate-sensor-btn').click(function () {
+		var calibration = {};
+		var types = ['gyro', 'accel'];
+		for (var i = 0; i < types.length; i++) {
+			var type = types[i];
+			calibration[type] = {};
+			for (var axis in quad.orientation[type]) {
+				calibration[type][axis] = - quad.orientation[type][axis];
+			}
+		}
+		quad.config.mpu6050.calibration = calibration;
+		sendCommand('config', quad.config);
+	});
 }
 
 $(function () {
 	var schemas = {};
+	var quad = {};
 
 	// Console
 	var $console = $('#console pre');
@@ -213,6 +229,8 @@ $(function () {
 	};
 
 	handlers['motors-speed'] = function (event) {
+		quad.motorsSpeed = event.speed;
+
 		schemas.top.setSpeed(event.speed);
 		schemas.sideX.setSpeed(event.speed.slice(0, 2));
 		schemas.sideY.setSpeed(event.speed.slice(2, 4));
@@ -225,6 +243,8 @@ $(function () {
 	};
 
 	handlers.orientation = function (event) {
+		quad.orientation = event.data;
+
 		schemas.sideX.setRotation(event.data.rotation.x);
 		schemas.sideY.setRotation(event.data.rotation.y);
 
@@ -244,6 +264,8 @@ $(function () {
 	};
 
 	handlers['os-stats'] = function (event) {
+		quad.osStats = event;
+
 		var $stats = $('#os-stats');
 
 		var loadavg = [];
@@ -260,8 +282,10 @@ $(function () {
 			.css('color', colorToRgb(shadeColor(getColorForPercentage(1 - memPct), -0.5)));
 	};
 
+	// TODO: if config is sent twice, events are listened twice too
 	handlers.config = function (event) {
 		var cfg = event.config;
+		quad.config = cfg;
 
 		var accessor = function (prop, value) {
 			var path = prop.split('.');
@@ -313,7 +337,7 @@ $(function () {
 		});
 	};
 
-	// Inject SVGs
+	// Inject SVGs into HTML to be able to style and animate them
 	var svgs = $('img[src$=".svg"]');
 	SVGInjector(svgs, null, function () {
 		schemas.top = new QuadcopterSchema('#quadcopter-top');
@@ -328,7 +352,7 @@ $(function () {
 
 		ws.addEventListener('open', function () {
 			log('Connection opened.');
-			init();
+			init(quad);
 		});
 
 		ws.addEventListener('error', function (event) {
