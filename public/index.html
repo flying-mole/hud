@@ -12,6 +12,9 @@
 	<script src="assets/components/jquery/dist/jquery.min.js"></script>
 	<script src="assets/components/bson/browser_build/bson.js"></script>
 	<script src="assets/components/svg-injector/dist/svg-injector.min.js"></script>
+	<script src="assets/broadway/Decoder.js"></script>
+	<script src="assets/broadway/WebGLCanvas.js"></script>
+	<script src="assets/broadway/Player.js"></script>
 	<script src="assets/main.js"></script>
 </head>
 <body>
@@ -81,80 +84,109 @@
 		</div>
 	</div>
 
+	<div id="camera">
+		<hr>
+
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-6 col-xs-12">
+					<div class="switch">
+						<input type="checkbox" id="camera-switch">
+						<label for="camera-switch"></label>
+					</div>
+					<label for="camera-switch">Enable camera</label>
+
+					<button class="btn btn-danger">Record</button>
+					<button class="btn btn-default">Stop</button>
+				</div>
+				<div class="col-lg-6 col-xs-12" id="camera-video"></div>
+			</div>
+		</div>
+	</div>
+
 	<hr>
 
 	<div class="container-fluid">
 		<form id="config-form" class="form-horizontal">
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Servos pins</label>
-				<div class="col-sm-10 form-inline">
-					<input type="number" name="servos.pins.0" class="form-control">, <input type="number" name="servos.pins.1" class="form-control">, <input type="number" name="servos.pins.2" class="form-control">, <input type="number" name="servos.pins.3" class="form-control">
+			<div class="row">
+				<div class="col-lg-6 col-xs-12">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Servos pins</label>
+						<div class="col-sm-10 form-inline">
+							<input type="number" name="servos.pins.0" class="form-control">, <input type="number" name="servos.pins.1" class="form-control">, <input type="number" name="servos.pins.2" class="form-control">, <input type="number" name="servos.pins.3" class="form-control">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Servos PWM output range</label>
+						<div class="col-sm-10 form-inline">
+							<input type="number" name="servos.range.0" class="form-control"> - <input type="number" name="servos.range.1" class="form-control"> (x10us)
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Broadcast interval</label>
+						<div class="col-sm-10 form-inline">
+							OS status: <input type="number" name="broadcastInterval.osStatus" class="form-control"> s<br>
+							Orientation: <input type="number" name="broadcastInterval.orientation" class="form-control"> s
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Physics</label>
+						<div class="col-sm-10 form-inline">
+							<div>
+								Total mass: <input type="number" name="physics.mass" class="form-control"> g
+							</div>
+							<div>
+								Diagonal length: <input type="number" name="physics.diagonalLength" class="form-control"> cm
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-6 col-xs-12">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PID interval</label>
+						<div class="col-sm-10 form-inline">
+							<input type="number" name="pid.interval" class="form-control"> ms
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PID values</label>
+						<div class="col-sm-10 form-inline">
+							<div>
+								Rate x: <input type="number" name="pid.values.rate.x.0" class="form-control">, <input type="number" name="pid.values.rate.x.1" class="form-control">, <input type="number" name="pid.values.rate.x.2" class="form-control">
+							</div>
+							<div>
+								Rate y: <input type="number" name="pid.values.rate.y.0" class="form-control">, <input type="number" name="pid.values.rate.y.1" class="form-control">, <input type="number" name="pid.values.rate.y.2" class="form-control">
+							</div>
+							<div>
+								Rate z: <input type="number" name="pid.values.rate.z.0" class="form-control">, <input type="number" name="pid.values.rate.z.1" class="form-control">, <input type="number" name="pid.values.rate.z.2" class="form-control">
+							</div>
+
+							<div>
+								Stabilize x: <input type="number" name="pid.values.stabilize.x.0" class="form-control">, <input type="number" name="pid.values.stabilize.x.1" class="form-control">, <input type="number" name="pid.values.stabilize.x.2" class="form-control">
+							</div>
+							<div>
+								Stabilize y: <input type="number" name="pid.values.stabilize.y.0" class="form-control">, <input type="number" name="pid.values.stabilize.y.1" class="form-control">, <input type="number" name="pid.values.stabilize.y.2" class="form-control">
+							</div>
+							<div>
+								Stabilize z: <input type="number" name="pid.values.stabilize.z.0" class="form-control">, <input type="number" name="pid.values.stabilize.z.1" class="form-control">, <input type="number" name="pid.values.stabilize.z.2" class="form-control">
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Servos PWM output range</label>
-				<div class="col-sm-10 form-inline">
-					<input type="number" name="servos.range.0" class="form-control"> - <input type="number" name="servos.range.1" class="form-control"> (x10us)
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label">PID interval</label>
-				<div class="col-sm-10 form-inline">
-					<input type="number" name="pid.interval" class="form-control"> ms
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label">PID values</label>
-				<div class="col-sm-10 form-inline">
-					<div>
-						Rate x: <input type="number" name="pid.values.rate.x.0" class="form-control">, <input type="number" name="pid.values.rate.x.1" class="form-control">, <input type="number" name="pid.values.rate.x.2" class="form-control">
+			<div class="row">
+				<div class="col-lg-6 col-xs-12">
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-primary">Update</button>
+							<button type="button" class="btn btn-default" id="export-config-btn">Export</button>
+						</div>
 					</div>
-					<div>
-						Rate y: <input type="number" name="pid.values.rate.y.0" class="form-control">, <input type="number" name="pid.values.rate.y.1" class="form-control">, <input type="number" name="pid.values.rate.y.2" class="form-control">
-					</div>
-					<div>
-						Rate z: <input type="number" name="pid.values.rate.z.0" class="form-control">, <input type="number" name="pid.values.rate.z.1" class="form-control">, <input type="number" name="pid.values.rate.z.2" class="form-control">
-					</div>
-
-					<div>
-						Stabilize x: <input type="number" name="pid.values.stabilize.x.0" class="form-control">, <input type="number" name="pid.values.stabilize.x.1" class="form-control">, <input type="number" name="pid.values.stabilize.x.2" class="form-control">
-					</div>
-					<div>
-						Stabilize y: <input type="number" name="pid.values.stabilize.y.0" class="form-control">, <input type="number" name="pid.values.stabilize.y.1" class="form-control">, <input type="number" name="pid.values.stabilize.y.2" class="form-control">
-					</div>
-					<div>
-						Stabilize z: <input type="number" name="pid.values.stabilize.z.0" class="form-control">, <input type="number" name="pid.values.stabilize.z.1" class="form-control">, <input type="number" name="pid.values.stabilize.z.2" class="form-control">
-					</div>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Broadcast interval</label>
-				<div class="col-sm-10 form-inline">
-					OS status: <input type="number" name="broadcastInterval.osStatus" class="form-control"> s<br>
-					Orientation: <input type="number" name="broadcastInterval.orientation" class="form-control"> s
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Physics</label>
-				<div class="col-sm-10 form-inline">
-					<div>
-						Total mass: <input type="number" name="physics.mass" class="form-control"> g
-					</div>
-					<div>
-						Diagonal length: <input type="number" name="physics.diagonalLength" class="form-control"> cm
-					</div>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-10">
-					<button type="submit" class="btn btn-primary">Update</button>
-					<button type="button" class="btn btn-default" id="export-config-btn">Export</button>
 				</div>
 			</div>
 		</form>

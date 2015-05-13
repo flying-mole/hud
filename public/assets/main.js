@@ -176,7 +176,7 @@ function init(quad) {
 		sendCommand('power', val / 100);
 	});
 
-	$('#power-switch').on('change', function () {
+	$('#power-switch').change(function () {
 		sendCommand('enable', $(this).prop('checked'));
 	});
 
@@ -193,6 +193,63 @@ function init(quad) {
 		}
 		quad.config.mpu6050.calibration = calibration;
 		sendCommand('config', quad.config);
+	});
+
+	var stream, nalDecoder;
+	$('#camera-switch').change(function () {
+		var enable = $(this).prop('checked');
+
+		if (stream) {
+			stream.abort();
+		}
+		if (nalDecoder) {
+			nalDecoder.terminate();
+		}
+
+		sendCommand('camera-enable', enable);
+
+		if (!enable) {
+			return;
+		}
+
+		var createStream = function (url, ondata) {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', url, true);
+			xhr.responseType = 'moz-chunked-arraybuffer'; // TODO
+			xhr.onprogress = function (event) {
+				ondata(xhr.response, event.loaded, event.total);
+			};
+			//xhr.onload = function () {
+			//	ondata(xhr.response);
+			//};
+			xhr.send(null);
+
+			return {
+				abort: function () {
+					xhr.abort();
+				}
+			};
+		};
+
+		var player = new Player({
+			useWorker: true,
+			workerFile: 'assets/broadway/Decoder.js'
+		});
+
+		nalDecoder = new Worker('assets/nal-decoder.js');
+		nalDecoder.addEventListener('message', function (event) {
+			player.decode(event.data);
+		}, false);
+
+		$('#camera-video').html(player.canvas);
+
+		// TODO
+		setTimeout(function () {
+			stream = createStream('/camera', function (data, loaded) {
+				nalDecoder.postMessage(data);
+				//console.log(loaded, data.byteLength);
+			});
+		}, 2000);
 	});
 }
 
@@ -251,7 +308,11 @@ $(function () {
 		var objectValues = function (obj) {
 			var list = [];
 			for (var key in obj) {
-				list.push(obj[key]);
+				var val = obj[key];
+				if (typeof val == 'number') { // Only keep two digits after the comma
+					val = Math.round(val * 100) / 100;
+				}
+				list.push(val);
 			}
 			return list;
 		};
@@ -260,7 +321,7 @@ $(function () {
 		$stats.find('.sensor-gyro').text(objectValues(event.data.gyro));
 		$stats.find('.sensor-accel').text(objectValues(event.data.accel));
 		$stats.find('.sensor-rotation').text(objectValues(event.data.rotation));
-		$stats.find('.sensor-temp').text(event.data.temp);
+		$stats.find('.sensor-temp').text(Math.round(event.data.temp));
 	};
 
 	handlers['os-stats'] = function (event) {
@@ -334,6 +395,9 @@ $(function () {
 		});
 		$form.find('#export-config-btn').click(function () {
 			var json = JSON.stringify(cfg, null, '\t');
+			var blob = new Blob([json], { type: 'application/json' });
+			var url = URL.createObjectURL(blob);
+			window.open(url);
 		});
 	};
 
