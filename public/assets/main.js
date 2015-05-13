@@ -196,7 +196,7 @@ function init(quad) {
 	});
 
 	var stream, nalDecoder;
-	$('#camera-switch').change(function () {
+	$('#camera-preview-switch').change(function () {
 		var enable = $(this).prop('checked');
 
 		if (stream) {
@@ -206,7 +206,7 @@ function init(quad) {
 			nalDecoder.terminate();
 		}
 
-		sendCommand('camera-enable', enable);
+		sendCommand('camera-preview', enable);
 
 		if (!enable) {
 			return;
@@ -250,6 +250,10 @@ function init(quad) {
 				//console.log(loaded, data.byteLength);
 			});
 		}, 2000);
+	});
+
+	$('#camera-record-switch').change(function () {
+		sendCommand('camera-record', $(this).prop('checked'));
 	});
 }
 
