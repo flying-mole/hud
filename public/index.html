@@ -104,6 +104,159 @@
 						</div>
 						<label for="camera-record-switch">Record</label>
 					</div>
+
+					<form id="camera-config-form" class="form-horizontal">
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Sharpness</label>
+							<div class="col-sm-10 form-inline">
+								<input type="range" name="sharpness" min="-100" max="100">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Contrast</label>
+							<div class="col-sm-10 form-inline">
+								<input type="range" name="contrast" min="-100" max="100">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Brightness</label>
+							<div class="col-sm-10 form-inline">
+								<input type="range" name="brightness" min="0" max="100">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Saturation</label>
+							<div class="col-sm-10 form-inline">
+								<input type="range" name="saturation" min="-100" max="100">
+							</div>
+						</div>
+
+						<!-- TODO -->
+						<!-- <div class="form-group">
+							<label class="col-sm-2 control-label">ISO</label>
+							<div class="col-sm-10 form-inline">
+								<div class="switch">
+									<input type="checkbox" name="ISO.enabled" id="ISO.enabled">
+									<label for="ISO.enabled"></label>
+								</div>
+								<input type="range" name="ISO" min="100" max="800">
+							</div>
+						</div> -->
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Stabilisation</label>
+							<div class="col-sm-10 form-inline">
+								<div class="switch">
+									<input type="checkbox" name="vstab" id="vstab">
+									<label for="vstab"></label>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">EV compensation</label>
+							<div class="col-sm-10 form-inline">
+								<input type="range" name="ev" min="-10" max="10">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Exposure</label>
+							<div class="col-sm-10 form-inline">
+								<select name="exposure" class="form-control">
+									<option>auto</option>
+									<option>night</option>
+									<option>nightpreview</option>
+									<option>backlight</option>
+									<option>spotlight</option>
+									<option>sports</option>
+									<option>snow</option>
+									<option>beach</option>
+									<option>verylong</option>
+									<option>fixedfps</option>
+									<option>antishake</option>
+									<option>fireworks</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label"><abbr title="Automatic White Balance">AWB</abbr></label>
+							<div class="col-sm-10 form-inline">
+								<select name="awb" class="form-control">
+									<option>off</option>
+									<option>auto</option>
+									<option>sun</option>
+									<option>cloud</option>
+									<option>shade</option>
+									<option>tungsten</option>
+									<option>fluorescent</option>
+									<option>incandescent</option>
+									<option>flash</option>
+									<option>horizon</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Metering</label>
+							<div class="col-sm-10 form-inline">
+								<select name="metering" class="form-control">
+									<option value="">default</option>
+									<option>average</option>
+									<option>spot</option>
+									<option>backlit</option>
+									<option>matrix</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label"><abbr title="Dynamic Range Compression">DRC</abbr></label>
+							<div class="col-sm-10 form-inline">
+								<select name="drc" class="form-control">
+									<option>off</option>
+									<option>low</option>
+									<option>medium</option>
+									<option>high</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Mode</label>
+							<div class="col-sm-10 form-inline">
+								<select name="mode" class="form-control">
+									<option value="0">Auto</option>
+									<option value="1">1920x1080, 16:9, 1-30fps</option>
+									<option value="2">2592x1944, 4:3, 1-15fps</option>
+									<option value="3">2592x1944, 4:3, 0.1666-1fps</option>
+									<option value="4">1296x972, 4:3, 1-42fps</option>
+									<option value="5">1296x730, 16:9, 1-49fps</option>
+									<option value="6">640x480, 4:3, 42.1-60fps</option>
+									<option value="7">640x480, 4:3, 60.1-90fps</option>
+								</select>
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-sm-2 control-label">Size</label>
+							<div class="col-sm-10 form-inline">
+								Width: <input type="number" name="width" class="form-control">px<br>
+								Height: <input type="number" name="height" class="form-control">px
+							</div>
+						</div>
+
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								<button type="submit" class="btn btn-primary">Submit</button>
+								<button type="reset" class="btn btn-default">Reset</button>
+							</div>
+						</div>
+					</form>
 				</div>
 				<div class="col-lg-6 col-xs-12" id="camera-video"></div>
 			</div>

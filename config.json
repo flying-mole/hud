@@ -35,5 +35,58 @@
 	},
 	"server": {
 		"port": 3000
+	},
+	"camera": {
+		"preview": {
+			"sharpness": 0,
+			"contrast": 0,
+			"brightness": 50,
+			"saturation": 0,
+			"ISO": null,
+			"vstab": false,
+			"ev": 0,
+			"exposure": "auto",
+			"awb": "auto",
+			"imxfx": "none",
+			"colfx": null,
+			"metering": null,
+			"rotation": null,
+			"hflip": false,
+			"vflip": false,
+			"shutter": null,
+			"drc": null,
+			"mode": 1,
+			"bitrate": null,
+
+			"width": 400,
+			"height": 400,
+			"framerate": 10,
+			"profile": "baseline"
+		},
+		"record": {
+			"sharpness": 0,
+			"contrast": 0,
+			"brightness": 50,
+			"saturation": 0,
+			"ISO": null,
+			"vstab": false,
+			"ev": 0,
+			"exposure": "auto",
+			"awb": "auto",
+			"imxfx": "none",
+			"colfx": null,
+			"metering": null,
+			"rotation": null,
+			"hflip": false,
+			"vflip": false,
+			"shutter": null,
+			"drc": null,
+			"mode": 1,
+			"width": null,
+			"height": null,
+			"bitrate": null,
+			"framerate": null,
+			"output": "/home/pi/output.h264"
+		}
 	}
 }

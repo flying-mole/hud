@@ -83,7 +83,6 @@ input[type="number"].form-control {
 	border: 5px solid rgba(211, 211, 211, 0.2);
 	border-radius: 50%;
 }
-
 .joystick .handle {
 	position: absolute;
 	width: 16px;
@@ -98,28 +97,43 @@ input[type="number"].form-control {
 }
 
 /* @see http://brennaobrien.com/blog/2014/05/style-input-type-range-in-every-browser.html */
-#power-input {
-	width: 100px;
-	height: 300px;
-	margin: auto;
+input[type="range"] {
 	border: 10px solid transparent;
 	background: none;
 }
-#power-input::-moz-range-track {
-	width: 5px;
+input[type="range"]::-moz-range-track {
 	background: rgba(211, 211, 211, 0.2);
 	border: none;
 	border-radius: 3px;
 }
-#power-input::-moz-range-thumb {
+input[type="range"]::-moz-range-thumb {
 	border: none;
 	height: 16px;
 	width: 16px;
 	border-radius: 50%;
 	background: rgb(58, 58, 58);
 }
-#power-input:active::-moz-range-thumb {
+input[type="range"]:active::-moz-range-thumb {
 	background: rgb(211, 211, 211);
+}
+
+input[type="range"]:not([orient="vertical"])::-moz-range-track {
+	height: 5px;
+}
+input[type="range"][orient="vertical"]::-moz-range-track {
+	width: 5px;
+}
+
+#power-input {
+	width: 100px;
+	height: 300px;
+	margin: auto;
+}
+
+select {
+	-webkit-appearance:none;
+	-moz-appearance:none;
+	appearance:none;
 }
 
 .switch {
