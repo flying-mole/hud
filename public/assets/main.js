@@ -187,6 +187,12 @@ function sendCommand(cmd, opts) {
 		});
 
 		return {
+			play: function () {
+				ws.send('play');
+			},
+			pause: function () {
+				ws.send('pause');
+			},
 			abort: function () {
 				ws.close();
 			}
@@ -194,50 +200,66 @@ function sendCommand(cmd, opts) {
 	};
 
 	var stream, nalDecoder;
-	function startPreview() {
-		var player = new Player({
-			useWorker: true,
-			workerFile: 'assets/broadway/Decoder.js'
-		});
+	var cameraPreview = {
+		start: function () {
+			if (cameraPreview.isEnabled()) {
+				this.stop();
+			}
 
-		sendCommand('camera-preview', true);
-
-		nalDecoder = new Worker('assets/nal-decoder.js');
-		nalDecoder.addEventListener('message', function (event) {
-			player.decode(event.data);
-		}, false);
-
-		$('#camera-video').html(player.canvas);
-
-		log('Starting h264 decoder');
-
-		// TODO
-		setTimeout(function () {
-			stream = createStream(function (data, loaded) {
-				nalDecoder.postMessage(data);
-				//console.log(loaded, data.byteLength);
+			var player = new Player({
+				useWorker: true,
+				workerFile: 'assets/broadway/Decoder.js'
 			});
-		}, 1500);
-	}
-	function stopPreview() {
-		sendCommand('camera-preview', false);
 
-		if (stream) {
-			stream.abort();
-		}
-		if (nalDecoder) {
-			nalDecoder.terminate();
-		}
-	}
+			sendCommand('camera-preview', true);
 
-	window.cameraPreview = {
-		start: startPreview,
-		stop: stopPreview,
+			nalDecoder = new Worker('assets/nal-decoder.js');
+			nalDecoder.addEventListener('message', function (event) {
+				player.decode(event.data);
+			}, false);
+
+			$('#camera-video').html(player.canvas);
+
+			log('Starting h264 decoder');
+
+			// TODO
+			setTimeout(function () {
+				stream = createStream(function (data, loaded) {
+					nalDecoder.postMessage(data);
+					//console.log(loaded, data.byteLength);
+				});
+			}, 1500);
+		},
+		stop: function () {
+			sendCommand('camera-preview', false);
+
+			if (stream) {
+				stream.abort();
+				stream = null;
+			}
+			if (nalDecoder) {
+				nalDecoder.terminate();
+				nalDecoder = null;
+			}
+		},
+		play: function () {
+			if (!stream) return this.start();
+			stream.play();
+		},
+		pause: function () {
+			if (!stream) return;
+			stream.pause();
+		},
 		restart: function () {
-			stopPreview();
-			startPreview();
+			this.stop();
+			this.start();
+		},
+		isEnabled: function () {
+			return (stream) ? true : false;
 		}
 	};
+
+	window.cameraPreview = cameraPreview;
 })();
 
 
@@ -276,7 +298,6 @@ function init(quad) {
 		sendCommand('enable', $(this).prop('checked'));
 	});
 
-	// TODO: not working properly with rotation
 	$('#calibrate-sensor-btn').click(function () {
 		var calibration = {};
 		var types = ['gyro', 'accel'];
@@ -287,25 +308,29 @@ function init(quad) {
 				calibration[type][axis] = - quad.orientation[type][axis];
 			}
 		}
+
+		// z accel is 1, because of gravitation :-P
+		calibration.accel.z -= 1;
+
 		quad.config.mpu6050.calibration = calibration;
 		sendCommand('config', quad.config);
 	});
 
-	
-	$('#camera-preview-switch').change(function () {
-		var enable = $(this).prop('checked');
-
+	$('#camera-play-btn').click(function () {
+		cameraPreview.play();
+	});
+	$('#camera-pause-btn').click(function () {
+		cameraPreview.pause();
+	});
+	$('#camera-stop-btn').click(function () {
 		cameraPreview.stop();
-
-		if (!enable) {
-			return;
-		}
-
-		cameraPreview.start();
 	});
 
-	$('#camera-record-switch').change(function () {
-		sendCommand('camera-record', $(this).prop('checked'));
+	$('#camera-record-btn').click(function () {
+		$(this).toggleClass('active');
+		var enabled = $(this).is('.active');
+		sendCommand('camera-record', enabled);
+		$('#camera-status-recording').toggle(enabled);
 	});
 }
 
@@ -475,7 +500,6 @@ $(function () {
 							break;
 					}
 				}
-				console.log(val);
 				accessor(name, val);
 			});
 		};

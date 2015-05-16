@@ -102,7 +102,7 @@ input[type="range"] {
 	background: none;
 }
 input[type="range"]::-moz-range-track {
-	background: rgba(211, 211, 211, 0.2);
+	background: rgb(58, 58, 58);
 	border: none;
 	border-radius: 3px;
 }
@@ -134,6 +134,24 @@ select {
 	-webkit-appearance:none;
 	-moz-appearance:none;
 	appearance:none;
+}
+
+.radio input[type="radio"] {
+	display: none;
+}
+.radio input[type="radio"] + label::before {
+	content: " ";
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin-right: 7px;
+	border: 2px solid rgb(58, 58, 58);
+	border-radius: 16px;
+	transition: 0.3s all;
+
+}
+.radio input[type="radio"]:checked + label::before {
+	background-color: rgb(58, 58, 58);
 }
 
 .switch {
@@ -192,4 +210,9 @@ select {
 	width: 300px;
 	height: 75px;
 	margin: 37px 0;
+}
+
+#camera-video canvas {
+	display: block;
+	margin: auto;
 }
