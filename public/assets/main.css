@@ -117,6 +117,9 @@ input[type="range"]:active::-moz-range-thumb {
 	background: rgb(211, 211, 211);
 }
 
+input[type="range"][orient="vertical"] {
+	-webkit-appearance: slider-vertical;
+}
 input[type="range"]:not([orient="vertical"])::-moz-range-track {
 	height: 5px;
 }
