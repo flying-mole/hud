@@ -85,8 +85,8 @@
 			"width": null,
 			"height": null,
 			"bitrate": null,
-			"framerate": null,
-			"output": "/home/pi/output.h264"
-		}
+			"framerate": null
+		},
+		"previewWhenRecording": false
 	}
 }
