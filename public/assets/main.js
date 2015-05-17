@@ -529,7 +529,22 @@ $(function () {
 			event.preventDefault();
 
 			sendCommand('config', cfg);
-			cameraPreview.restart(); // TODO: do not do this if recording
+
+			if (cameraPreview.isEnabled()) {
+				cameraPreview.restart();
+			}
+		});
+
+		$('#ISO-switch').change(function () {
+			if ($(this).prop('checked')) {
+				var val = parseInt($camForm.find('[name="ISO"]').val());
+				accessor('camera.preview.ISO', val);
+			} else {
+				accessor('camera.preview.ISO', null);
+			}
+		});
+		$camForm.find('[name="ISO"]').change(function () {
+			$('#ISO-switch').prop('checked', true);
 		});
 	};
 
