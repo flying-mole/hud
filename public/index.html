@@ -12,6 +12,7 @@
 	<script src="assets/components/jquery/dist/jquery.min.js"></script>
 	<script src="assets/components/bson/browser_build/bson.js"></script>
 	<script src="assets/components/svg-injector/dist/svg-injector.min.js"></script>
+	<script src="assets/components/smoothie/smoothie.js"></script>
 	<script src="assets/broadway/Decoder.js"></script>
 	<script src="assets/broadway/WebGLCanvas.js"></script>
 	<script src="assets/broadway/Player.js"></script>
@@ -55,13 +56,19 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-3 col-xs-6 hidden-xs hidden-sm">
+			<div class="col-lg-3 col-xs-6 hidden-xs hidden-sm text-center">
+				<strong>Direction</strong>
 				<div id="direction-input" class="joystick">
 					<div class="handle"></div>
 				</div>
 			</div>
-			<div class="col-lg-3 col-xs-6">
+			<div class="col-lg-2 col-xs-6 text-center">
+				<strong>Power</strong>
 				<input type="range" id="power-input" orient="vertical" value="0" step="5" min="0" max="100">
+			</div>
+			<div class="col-lg-1 col-xs-6  text-center">
+				<strong>Rotation</strong>
+				<input type="range" id="rotate-input" orient="vertical" value="0" step="5" min="-100" max="100">
 			</div>
 			<div class="col-lg-3 col-xs-12 text-center">
 				<img src="assets/quadcopter-top.svg" alt="" class="quadcopter-schema" id="quadcopter-top">
@@ -79,8 +86,24 @@
 					Rotation (°): <span class="sensor-rotation"></span><br>
 					Temperature (°C): <span class="sensor-temp"></span>
 				</p>
+
 				<button id="calibrate-sensor-btn" class="btn btn-default">Calibrate</button>
+				<button id="sensor-record-btn" class="btn btn-danger" title="Record"><span class="glyphicon glyphicon-record"></span></button>
 			</div>
+
+			<div class="col-lg-4 col-xs-12 graph-ctn">
+				<strong>Gyro</strong>
+				<canvas id="sensor-gyro-graph" width="400" height="100"></canvas>
+			</div>
+			<div class="col-lg-4 col-xs-12 graph-ctn">
+				<strong>Accel</strong>
+				<canvas id="sensor-accel-graph" width="400" height="100"></canvas>
+			</div>
+			<div class="col-lg-4 col-xs-12 graph-ctn">
+				<strong>Rotation</strong>
+				<canvas id="sensor-rotation-graph" width="400" height="100"></canvas>
+			</div>
+			<canvas id="motors-speed-graph" width="400" height="100"></canvas>
 		</div>
 	</div>
 

@@ -262,6 +262,51 @@ function sendCommand(cmd, opts) {
 	window.cameraPreview = cameraPreview;
 })();
 
+(function () {
+	var graphs = {};
+
+	var graphNames = [
+		'gyro_x', 'gyro_y', 'gyro_z',
+		'accel_x', 'accel_y', 'accel_z',
+		'rotation_x', 'rotation_y', 'rotation_z'
+	];
+	for (var i = 0; i < graphNames.length; i++) {
+		var name = graphNames[i];
+		graphs[name] = new TimeSeries();
+	}
+
+	window.graphs = graphs;
+})();
+
+$(function () {
+	var chartStyle = {
+		grid: {
+			fillStyle: 'transparent',
+			borderVisible: false
+		}
+	};
+	var redLine = { strokeStyle: 'rgb(255, 0, 0)' };
+	var greenLine = { strokeStyle: 'rgb(0, 255, 0)' };
+	var blueLine = { strokeStyle: 'rgb(0, 0, 255)' };
+
+	var gyro = new SmoothieChart(chartStyle);
+	gyro.streamTo(document.getElementById('sensor-gyro-graph'));
+	gyro.addTimeSeries(graphs.gyro_x, redLine);
+	gyro.addTimeSeries(graphs.gyro_y, greenLine);
+	gyro.addTimeSeries(graphs.gyro_z, blueLine);
+
+	var accel = new SmoothieChart(chartStyle);
+	accel.streamTo(document.getElementById('sensor-accel-graph'));
+	accel.addTimeSeries(graphs.accel_x, redLine);
+	accel.addTimeSeries(graphs.accel_y, greenLine);
+	accel.addTimeSeries(graphs.accel_z, blueLine);
+
+	var rotation = new SmoothieChart(chartStyle);
+	rotation.streamTo(document.getElementById('sensor-rotation-graph'));
+	rotation.addTimeSeries(graphs.rotation_x, redLine);
+	rotation.addTimeSeries(graphs.rotation_y, greenLine);
+	rotation.addTimeSeries(graphs.rotation_z, blueLine);
+});
 
 function init(quad) {
 	var joystick = new Joystick('#direction-input', function (data) {
@@ -404,6 +449,21 @@ $(function () {
 		$stats.find('.sensor-accel').text(objectValues(event.data.accel));
 		$stats.find('.sensor-rotation').text(objectValues(event.data.rotation));
 		$stats.find('.sensor-temp').text(Math.round(event.data.temp));
+
+		// Graphs
+		var timestamp = new Date().getTime();
+
+		graphs.gyro_x.append(timestamp, event.data.gyro.x);
+		graphs.gyro_y.append(timestamp, event.data.gyro.y);
+		graphs.gyro_z.append(timestamp, event.data.gyro.z);
+
+		graphs.accel_x.append(timestamp, event.data.accel.x);
+		graphs.accel_y.append(timestamp, event.data.accel.y);
+		graphs.accel_z.append(timestamp, event.data.accel.z);
+
+		graphs.rotation_x.append(timestamp, event.data.rotation.x);
+		graphs.rotation_y.append(timestamp, event.data.rotation.y);
+		//graphs.rotation_z.append(timestamp, event.data.rotation.z);
 	};
 
 	handlers['os-stats'] = function (event) {

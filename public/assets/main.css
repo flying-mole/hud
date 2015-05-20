@@ -79,9 +79,9 @@ input[type="number"].form-control {
 	position: relative;
 	width: 300px;
 	height: 300px;
-	margin: auto;
 	border: 5px solid rgba(211, 211, 211, 0.2);
 	border-radius: 50%;
+	margin: 10px auto;
 }
 .joystick .handle {
 	position: absolute;
@@ -218,4 +218,9 @@ select {
 #camera-video canvas {
 	display: block;
 	margin: auto;
+}
+
+.graph-ctn canvas {
+	max-width: 100%;
+	display: block;
 }
