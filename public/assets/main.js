@@ -268,7 +268,8 @@ function sendCommand(cmd, opts) {
 	var graphNames = [
 		'gyro_x', 'gyro_y', 'gyro_z',
 		'accel_x', 'accel_y', 'accel_z',
-		'rotation_x', 'rotation_y', 'rotation_z'
+		'rotation_x', 'rotation_y', 'rotation_z',
+		'motors_speed_0', 'motors_speed_1', 'motors_speed_2', 'motors_speed_3'
 	];
 	for (var i = 0; i < graphNames.length; i++) {
 		var name = graphNames[i];
@@ -288,6 +289,7 @@ $(function () {
 	var redLine = { strokeStyle: 'rgb(255, 0, 0)' };
 	var greenLine = { strokeStyle: 'rgb(0, 255, 0)' };
 	var blueLine = { strokeStyle: 'rgb(0, 0, 255)' };
+	var yellowLine = { strokeStyle: 'yellow' };
 
 	var gyro = new SmoothieChart(chartStyle);
 	gyro.streamTo(document.getElementById('sensor-gyro-graph'));
@@ -306,6 +308,13 @@ $(function () {
 	rotation.addTimeSeries(graphs.rotation_x, redLine);
 	rotation.addTimeSeries(graphs.rotation_y, greenLine);
 	rotation.addTimeSeries(graphs.rotation_z, blueLine);
+
+	var motorsSpeed = new SmoothieChart(chartStyle);
+	motorsSpeed.streamTo(document.getElementById('motors-speed-graph'));
+	motorsSpeed.addTimeSeries(graphs.motors_speed_0, redLine);
+	motorsSpeed.addTimeSeries(graphs.motors_speed_1, greenLine);
+	motorsSpeed.addTimeSeries(graphs.motors_speed_2, blueLine);
+	motorsSpeed.addTimeSeries(graphs.motors_speed_3, yellowLine);
 });
 
 function init(quad) {
@@ -424,6 +433,12 @@ $(function () {
 			return Math.round(speed * 100);
 		}).join('<br>');
 		$stats.find('.motors-speed').html(speeds);
+
+		var timestamp = new Date().getTime();
+		graphs.motors_speed_0.append(timestamp, event.speed[0]);
+		graphs.motors_speed_1.append(timestamp, event.speed[1]);
+		graphs.motors_speed_2.append(timestamp, event.speed[2]);
+		graphs.motors_speed_3.append(timestamp, event.speed[3]);
 	};
 
 	handlers.orientation = function (event) {
