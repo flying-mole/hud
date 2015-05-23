@@ -317,6 +317,77 @@ $(function () {
 	motorsSpeed.addTimeSeries(graphs.motors_speed_3, yellowLine);
 });
 
+(function () {
+	var header, data;
+	var isRecording = false;
+	var graphsExport = {
+		start: function () {
+			isRecording = true;
+			this.reset();
+		},
+		stop: function () {
+			isRecording = false;
+		},
+		reset: function () {
+			header = ['timestamp'];
+			data = [];
+		},
+		isRecording: function () {
+			return isRecording;
+		},
+		append: function (name, timestamp, dataset) {
+			if (!isRecording) return;
+
+			var lastline = data[data.length - 1];
+
+			var line = new Array(header.length);
+			line[0] = timestamp;
+
+			var hasPushedNewData = false;
+			for (var key in dataset) {
+				var value = dataset[key];
+				var headerKey = name+'.'+key;
+				var i = header.indexOf(headerKey);
+				if (i >= 0) {
+					if (lastline && !hasPushedNewData && typeof lastline[i] != 'number') {
+						lastline[i] = value;
+					} else {
+						line[i] = value;
+						hasPushedNewData = true;
+					}
+				} else {
+					header.push(headerKey);
+					if (lastline) {
+						lastline.push(value);
+					} else {
+						line.push(value);
+						hasPushedNewData = true;
+					}
+				}
+			}
+
+			if (hasPushedNewData) {
+				data.push(line);
+			}
+		},
+		toCsv: function () {
+			if (!data || !header) return;
+
+			var csv = '';
+			csv += header.join(',');
+
+			for (var i = 0; i < data.length; i++) {
+				var line = data[i].join(',');
+				csv += '\n'+line;
+			}
+
+			return csv;
+		}
+	};
+
+	window.graphsExport = graphsExport;
+})();
+
 function init(quad) {
 	var joystick = new Joystick('#direction-input', function (data) {
 		//sendCommand('orientation', data);
@@ -386,6 +457,22 @@ function init(quad) {
 		sendCommand('camera-record', enabled);
 		$('#camera-status-recording').toggle(enabled);
 	});
+
+	$('#sensor-record-btn').click(function () {
+		if (graphsExport.isRecording()) {
+			graphsExport.stop();
+		} else {
+			graphsExport.start();
+		}
+		$('#sensor-status-recording').toggle(graphsExport.isRecording());
+	});
+	$('#sensor-export-btn').click(function () {
+		var csv = graphsExport.toCsv();
+		if (!csv) return;
+		var blob = new Blob([csv], { type: 'text/csv' });
+		var url = URL.createObjectURL(blob);
+		window.open(url);
+	});
 }
 
 $(function () {
@@ -439,6 +526,8 @@ $(function () {
 		graphs.motors_speed_1.append(timestamp, event.speed[1]);
 		graphs.motors_speed_2.append(timestamp, event.speed[2]);
 		graphs.motors_speed_3.append(timestamp, event.speed[3]);
+
+		graphsExport.append('motors-speed', timestamp, event.speed);
 	};
 
 	handlers.orientation = function (event) {
@@ -479,6 +568,10 @@ $(function () {
 		graphs.rotation_x.append(timestamp, event.data.rotation.x);
 		graphs.rotation_y.append(timestamp, event.data.rotation.y);
 		//graphs.rotation_z.append(timestamp, event.data.rotation.z);
+		
+		for (var name in event.data) {
+			graphsExport.append(name, timestamp, event.data[name]);
+		}
 	};
 
 	handlers['os-stats'] = function (event) {

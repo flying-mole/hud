@@ -88,7 +88,12 @@
 				</p>
 
 				<button id="calibrate-sensor-btn" class="btn btn-default">Calibrate</button>
-				<button id="sensor-record-btn" class="btn btn-danger" title="Record"><span class="glyphicon glyphicon-record"></span></button>
+				<div class="btn-group" role="group">
+					<button id="sensor-record-btn" class="btn btn-danger" title="Record"><span class="glyphicon glyphicon-record"></span></button>
+					<button id="sensor-export-btn" class="btn btn-default">Export</button>
+				</div>
+
+				<p id="sensor-status-recording" class="text-danger" style="display: none;">Recording...</p>
 			</div>
 
 			<div class="col-lg-4 col-xs-12 graph-ctn">
