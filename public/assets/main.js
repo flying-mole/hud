@@ -423,6 +423,10 @@ function init(quad) {
 		sendCommand('enable', $(this).prop('checked'));
 	});
 
+	$('#pid-switch').change(function () {
+		sendCommand('pid-enable', $(this).prop('checked'));
+	});
+
 	$('#calibrate-sensor-btn').click(function () {
 		var calibration = {};
 		var types = ['gyro', 'accel'];
