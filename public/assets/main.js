@@ -515,14 +515,20 @@ $(function () {
 	handlers['motors-speed'] = function (event) {
 		quad.motorsSpeed = event.speed;
 
-		schemas.top.setSpeed(event.speed);
-		schemas.sideX.setSpeed(event.speed.slice(0, 2));
-		schemas.sideY.setSpeed(event.speed.slice(2, 4));
+		var speedsRatio = [0, 0, 0, 0];
+		if (quad.config) {
+			var range = quad.config.servos.range;
+			speedsRatio = event.speed.map(function (speed) {
+				return (speed - range[0]) / (range[1] - range[0]);
+			});
+		}
+
+		schemas.top.setSpeed(speedsRatio);
+		schemas.sideX.setSpeed(speedsRatio.slice(0, 2));
+		schemas.sideY.setSpeed(speedsRatio.slice(2, 4));
 
 		var $stats = $('#motors-stats');
-		var speeds = event.speed.map(function (speed) {
-			return Math.round(speed * 100);
-		}).join('<br>');
+		var speeds = event.speed.join('<br>');
 		$stats.find('.motors-speed').html(speeds);
 
 		var timestamp = new Date().getTime();

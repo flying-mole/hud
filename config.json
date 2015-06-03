@@ -12,6 +12,7 @@
 	"servos": {
 		"pins": [0, 1, 2, 3],
 		"range": [85, 140, 185],
+		"initPeriod": 100,
 		"massToPeriod": [91.344803622, 0.0676439999, 0.0000557704991374891]
 	},
 	"broadcastInterval": {
