@@ -1,8 +1,9 @@
-{
+module.exports = {
 	"physics": {
-		"gravity": 9.81,
-		"mass": 750,
-		"diagonalLength": 100
+		"gravity": 9.81, // cst
+		"motorMass": 50, // en grammes
+		"structureMass": 30, // en grammes
+		"diagonalLength": 45 // distance moteur-moteur en cm
 	},
 	"mpu6050": {
 		"device": 1,
@@ -13,7 +14,7 @@
 		"pins": [0, 1, 2, 3],
 		"range": [85, 140, 185],
 		"initPeriod": 100,
-		"massToPeriod": [91.344803622, 0.0676439999, 0.0000557704991374891]
+		"massToPeriod": [91.344803622, 0.0676439999, 0.0000557704991374891] // coeffs for cst, x and x²
 	},
 	"broadcastInterval": {
 		"osStatus": 10,
@@ -21,16 +22,16 @@
 	},
 	"pid": {
 		"interval": 100,
-		"values": {
+		"values": { // cst for PIDs: [k_P, k_I, k_D]
 			"rate": {
 				"x": [0.05, 0, 0],
 				"y": [0.05, 0, 0],
 				"z": [0.05, 0, 0]
 			},
 			"stabilize": {
-				"x": [1, 0, 0],
-				"y": [1, 0, 0],
-				"z": [1, 0, 0]
+				"x": [0, 0, 0],
+				"y": [0, 0, 0],
+				"z": [0, 0, 0]
 			}
 		}
 	},
@@ -90,4 +91,4 @@
 		},
 		"previewWhenRecording": false
 	}
-}
+};

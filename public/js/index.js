@@ -1,48 +1,10 @@
 var BSON = bson().BSON;
 var ws;
 
-var percentColors = [
-	{ pct: 0.0, color: { r: 0xff, g: 0x00, b: 0 } },
-	{ pct: 0.5, color: { r: 0xff, g: 0xff, b: 0 } },
-	{ pct: 1.0, color: { r: 0x00, g: 0xff, b: 0 } } ];
-
-var getColorForPercentage = function(pct) {
-	for (var i = 1; i < percentColors.length - 1; i++) {
-		if (pct < percentColors[i].pct) {
-			break;
-		}
-	}
-	var lower = percentColors[i - 1];
-	var upper = percentColors[i];
-	var range = upper.pct - lower.pct;
-	var rangePct = (pct - lower.pct) / range;
-	var pctLower = 1 - rangePct;
-	var pctUpper = rangePct;
-	var color = {
-		r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
-		g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
-		b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
-	};
-	return color;
-}
-
-/**
- * @see http://stackoverflow.com/questions/5560248/programmatically-lighten-or-darken-a-hex-color-or-rgb-and-blend-colors
- */
-var shadeColor = function (color, p) {
-	var t = (p < 0) ? 0 : 255,
-		p = (p < 0) ? p*-1 : p;
-
-	return {
-		r: Math.round((t-color.r)*p)+color.r,
-		g: Math.round((t-color.g)*p)+color.g,
-		b: Math.round((t-color.b)*p)+color.b
-	};
-};
-
-var colorToRgb = function (color) {
-	return 'rgb(' + [color.r, color.g, color.b].join(',') + ')';
-};
+var colors = require('./colors');
+var getColorForPercentage = colors.getForPercentage,
+	shadeColor = colors.shade,
+	colorToRgb = colors.toRgb;
 
 function Joystick(el, oninput) {
 	var that = this;
@@ -120,6 +82,46 @@ function DeviceOrientationJoystick(oninput) {
 }
 DeviceOrientationJoystick.isSupported = function () {
 	return (typeof window.DeviceOrientationEvent != 'undefined');
+};
+
+function HardwareJoystick(oninput) {
+	if (!HardwareJoystick.isSupported()) {
+		throw new Error('Gamepad API not supported');
+	}
+
+	var that = this;
+
+	window.addEventListener('gamepadconnected', function (e) {
+		console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
+			e.gamepad.index, e.gamepad.id,
+			e.gamepad.buttons.length, e.gamepad.axes.length);
+		log('Gamepad "'+e.gamepad.id+'" connected.');
+
+		that.gamepad = navigator.getGamepads()[e.gamepad.index];
+		that._loop(oninput);
+	});
+
+	window.addEventListener('gamepaddisconnected', function (e) {
+		log('Gamepad "'+e.gamepad.id+'" disconnected.');
+	});
+}
+HardwareJoystick.isSupported = function () {
+	return (!!navigator.getGamepads || !!navigator.webkitGetGamepads);
+};
+
+HardwareJoystick.prototype._loop = function (oninput) {
+	console.log(this.gamepad);
+
+	var gamepad = this.gamepad;
+
+	setInterval(function () { // TODO
+		oninput({
+			alpha: gamepad.axes[1],
+			beta: gamepad.axes[0], // front-to-back tilt in degrees, where front is positive
+			gamma: gamepad.axes[2] // left-to-right tilt in degrees, where right is positive
+		});
+		// gamepad.axes[3] is POWER
+	}, 500);
 };
 
 function QuadcopterSchema(svg) {
@@ -405,6 +407,11 @@ function init(quad) {
 			if ($switch.prop('checked')) {
 				sendCommand('orientation', data);
 			}
+		});
+	}
+	if (HardwareJoystick.isSupported()) {
+		var hwOrientation = new HardwareJoystick(function (data) {
+			sendCommand('orientation', data);
 		});
 	}
 
