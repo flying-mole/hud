@@ -1,10 +1,13 @@
 var BSON = bson().BSON;
+window.BSON = BSON;
 var ws;
 
 var colors = require('./colors');
 var getColorForPercentage = colors.getForPercentage,
 	shadeColor = colors.shade,
 	colorToRgb = colors.toRgb;
+
+var Quadcopter = require('./quadcopter');
 
 function Joystick(el, oninput) {
 	var that = this;
@@ -139,13 +142,6 @@ QuadcopterSchema.prototype.setSpeed = function (speed) {
 QuadcopterSchema.prototype.setRotation = function (rot) {
 	this.svg.css('transform', 'rotate('+rot+'deg)');
 };
-
-function sendCommand(cmd, opts) {
-	ws.send(BSON.serialize({
-		cmd: cmd,
-		opts: opts
-	}));
-}
 
 (function () {
 	/*var createStream = function (ondata) {
@@ -488,11 +484,11 @@ function init(quad) {
 
 $(function () {
 	var schemas = {};
-	var quad = {};
+
+	var quad = new Quadcopter();
 
 	// Console
 	var $console = $('#console pre');
-
 	function log(msg, type) {
 		if (type) {
 			msg = '<span class="'+type+'">'+msg+'</span>';
@@ -501,31 +497,31 @@ $(function () {
 	}
 	window.log = log;
 
-	// Events handlers
-	var handlers = {};
-
-	handlers.error = function (event) {
-		log(event.msg, 'error');
-	};
-	handlers.info = function (event) {
-		log(event.msg, 'info');
+	window.sendCommand = function (cmd, opts) {
+		quad.client.send(cmd, opts);
 	};
 
-	handlers.enabled = function (event) {
-		$('#power-switch').prop('checked', event.enabled);
-	};
+	quad.on('error', function (msg) {
+		log(msg, 'error');
+	});
 
-	handlers.power = function (event) {
-		$('#power-input').val(event.power * 100);
-	};
+	quad.on('info', function (msg) {
+		log(msg, 'info');
+	});
 
-	handlers['motors-speed'] = function (event) {
-		quad.motorsSpeed = event.speed;
+	quad.on('enabled', function (enabled) {
+		$('#power-switch').prop('checked', enabled);
+	});
 
+	quad.on('power', function (power) {
+		$('#power-input').val(Math.round(power * 100));
+	});
+
+	quad.on('motors-speed', function (speeds) {
 		var speedsRatio = [0, 0, 0, 0];
 		if (quad.config) {
 			var range = quad.config.servos.range;
-			speedsRatio = event.speed.map(function (speed) {
+			speedsRatio = speeds.map(function (speed) {
 				return (speed - range[0]) / (range[1] - range[0]);
 			});
 		}
@@ -535,23 +531,20 @@ $(function () {
 		schemas.sideY.setSpeed(speedsRatio.slice(2, 4));
 
 		var $stats = $('#motors-stats');
-		var speeds = event.speed.join('<br>');
-		$stats.find('.motors-speed').html(speeds);
+		$stats.find('.motors-speed').html(speeds.join('<br>'));
 
 		var timestamp = new Date().getTime();
-		graphs.motors_speed_0.append(timestamp, event.speed[0]);
-		graphs.motors_speed_1.append(timestamp, event.speed[1]);
-		graphs.motors_speed_2.append(timestamp, event.speed[2]);
-		graphs.motors_speed_3.append(timestamp, event.speed[3]);
+		graphs.motors_speed_0.append(timestamp, speeds[0]);
+		graphs.motors_speed_1.append(timestamp, speeds[1]);
+		graphs.motors_speed_2.append(timestamp, speeds[2]);
+		graphs.motors_speed_3.append(timestamp, speeds[3]);
 
-		graphsExport.append('motors-speed', timestamp, event.speed);
-	};
+		graphsExport.append('motors-speed', timestamp, speeds);
+	});
 
-	handlers.orientation = function (event) {
-		quad.orientation = event.data;
-
-		schemas.sideX.setRotation(event.data.rotation.x);
-		schemas.sideY.setRotation(event.data.rotation.y);
+	quad.on('orientation', function (orientation) {
+		schemas.sideX.setRotation(orientation.rotation.x);
+		schemas.sideY.setRotation(orientation.rotation.y);
 
 		var objectValues = function (obj) {
 			var list = [];
@@ -566,55 +559,50 @@ $(function () {
 		};
 
 		var $stats = $('#sensor-stats');
-		$stats.find('.sensor-gyro').text(objectValues(event.data.gyro));
-		$stats.find('.sensor-accel').text(objectValues(event.data.accel));
-		$stats.find('.sensor-rotation').text(objectValues(event.data.rotation));
-		$stats.find('.sensor-temp').text(Math.round(event.data.temp));
+		$stats.find('.sensor-gyro').text(objectValues(orientation.gyro));
+		$stats.find('.sensor-accel').text(objectValues(orientation.accel));
+		$stats.find('.sensor-rotation').text(objectValues(orientation.rotation));
+		$stats.find('.sensor-temp').text(Math.round(orientation.temp));
 
 		// Graphs
 		var timestamp = new Date().getTime();
 
-		graphs.gyro_x.append(timestamp, event.data.gyro.x);
-		graphs.gyro_y.append(timestamp, event.data.gyro.y);
-		graphs.gyro_z.append(timestamp, event.data.gyro.z);
+		graphs.gyro_x.append(timestamp, orientation.gyro.x);
+		graphs.gyro_y.append(timestamp, orientation.gyro.y);
+		graphs.gyro_z.append(timestamp, orientation.gyro.z);
 
-		graphs.accel_x.append(timestamp, event.data.accel.x);
-		graphs.accel_y.append(timestamp, event.data.accel.y);
-		graphs.accel_z.append(timestamp, event.data.accel.z);
+		graphs.accel_x.append(timestamp, orientation.accel.x);
+		graphs.accel_y.append(timestamp, orientation.accel.y);
+		graphs.accel_z.append(timestamp, orientation.accel.z);
 
-		graphs.rotation_x.append(timestamp, event.data.rotation.x);
-		graphs.rotation_y.append(timestamp, event.data.rotation.y);
-		//graphs.rotation_z.append(timestamp, event.data.rotation.z);
+		graphs.rotation_x.append(timestamp, orientation.rotation.x);
+		graphs.rotation_y.append(timestamp, orientation.rotation.y);
+		//graphs.rotation_z.append(timestamp, orientation.rotation.z);
 		
-		for (var name in event.data) {
-			graphsExport.append(name, timestamp, event.data[name]);
+		for (var name in orientation) {
+			graphsExport.append(name, timestamp, orientation[name]);
 		}
-	};
+	});
 
-	handlers['os-stats'] = function (event) {
-		quad.osStats = event;
-
+	quad.on('os-stats', function (stats) {
 		var $stats = $('#os-stats');
 
 		var loadavg = [];
-		for (var i = 0; i < event.loadavg.length; i++) {
-			var avg = event.loadavg[i];
+		for (var i = 0; i < stats.loadavg.length; i++) {
+			var avg = stats.loadavg[i];
 			var pct = Math.round(avg * 100);
 			loadavg.push('<span style="color: '+colorToRgb(shadeColor(getColorForPercentage(1 - avg), -0.5))+';">'+pct+'%</span>');
 		}
 		$stats.find('.os-loadavg').html(loadavg.join(', '));
 
-		var memPct = event.mem.free / event.mem.total;
+		var memPct = stats.mem.free / stats.mem.total;
 		$stats.find('.os-mem')
-			.text(event.mem.free + '/' + event.mem.total + ' ('+Math.round(memPct * 100)+'%)')
+			.text(stats.mem.free + '/' + stats.mem.total + ' ('+Math.round(memPct * 100)+'%)')
 			.css('color', colorToRgb(shadeColor(getColorForPercentage(1 - memPct), -0.5)));
-	};
+	});
 
-	// TODO: if config is sent twice, events are listened twice too
-	handlers.config = function (event) {
-		var cfg = event.config;
-		quad.config = cfg;
-
+	// TODO: handle multiple config changes
+	quad.once('config', function (cfg) {
 		var accessor = function (prop, value) {
 			var path = prop.split('.');
 
@@ -731,7 +719,7 @@ $(function () {
 		$camForm.find('[name="ISO"]').change(function () {
 			$('#ISO-switch').prop('checked', true);
 		});
-	};
+	});
 
 	// Inject SVGs into HTML to be able to style and animate them
 	var svgs = $('img[src$=".svg"]');
@@ -742,33 +730,12 @@ $(function () {
 
 		// Init
 		log('Connecting to server...');
+		quad.init(function (err) {
+			if (err) return log(err, 'error');
 
-		ws = new WebSocket('ws://'+window.location.host+'/socket');
-		ws.binaryType = 'arraybuffer';
-
-		ws.addEventListener('open', function () {
-			log('Connection opened.');
 			init(quad);
-		});
 
-		ws.addEventListener('error', function (event) {
-			console.error(error);
-			log('Connection error!', 'error');
-		});
-
-		ws.addEventListener('close', function () {
-			log('Connection closed.', 'info');
-		});
-
-		ws.addEventListener('message', function (event) {
-			var msg = BSON.deserialize(new Uint8Array(event.data));
-			
-			if (!handlers[msg.type]) {
-				console.error('Unsupported message type: "'+msg.type+'"');
-				return;
-			}
-
-			handlers[msg.type](msg);
+			log('Connected!');
 		});
 	});
 });
