@@ -26,7 +26,7 @@ function Quadcopter() {
 				return props.enabled;
 			},
 			set: function (val) {
-				// TODO
+				that.client.send('enable', val);
 			}
 		},
 		pidEnabled: {
@@ -35,7 +35,7 @@ function Quadcopter() {
 				return props.pidEnabled;
 			},
 			set: function (val) {
-				// TODO
+				that.client.send('pid-enable', val);
 			}
 		},
 		config: {
@@ -44,7 +44,7 @@ function Quadcopter() {
 				return that._config;
 			},
 			set: function (val) {
-				// TODO
+				that.client.send('config', val);
 			}
 		},
 		power: {
@@ -53,7 +53,7 @@ function Quadcopter() {
 				return props.power;
 			},
 			set: function (val) {
-				// TODO
+				that.client.send('power', val);
 			}
 		},
 		orientation: {
@@ -62,16 +62,16 @@ function Quadcopter() {
 				return props.orientation;
 			},
 			set: function (val) {
-				// TODO
+				that.client.send('orientation', val);
 			}
 		},
-		rotationSpeed: { // TODO: remove this (just for testing)
+		rotationSpeed: {
 			enumerable: true,
 			get: function () {
 				return props.rotationSpeed;
 			},
 			set: function (val) {
-				// TODO
+				that.client.send('rotation-speed', val);
 			}
 		},
 		motorsSpeed: {

@@ -497,6 +497,7 @@ $(function () {
 	}
 	window.log = log;
 
+	// TODO: this is deprecated, use Quadcopter methods instead
 	window.sendCommand = function (cmd, opts) {
 		quad.client.send(cmd, opts);
 	};
