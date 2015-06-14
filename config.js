@@ -38,7 +38,7 @@ module.exports = {
 	"server": {
 		"port": 3000 // HTTP server port
 	},
-	"camera": {
+	"camera": { // Camera setup - see https://www.raspberrypi.org/documentation/hardware/camera.md
 		"preview": {
 			"sharpness": 0,
 			"contrast": 0,

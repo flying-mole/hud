@@ -16,6 +16,10 @@ MsgHandler.prototype = {
 	info: function (msg) {
 		this.quad.emit('info', msg.msg);
 	},
+	features: function (msg) {
+		this.quad._props.features = msg.features;
+		this.quad.emit('features', msg.features);
+	},
 	enabled: function (msg) {
 		this.quad._props.enabled = msg.enabled;
 		this.quad.emit('enabled', msg.enabled);

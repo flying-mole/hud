@@ -11,7 +11,8 @@ function Quadcopter() {
 		enabled: false,
 		pidEnabled: true,
 		power: 0,
-		motorsSpeed: null
+		motorsSpeed: null,
+		features: null
 	};
 	this._props = props;
 
@@ -78,6 +79,12 @@ function Quadcopter() {
 			enumerable: true,
 			get: function () {
 				return props.motorsSpeed;
+			}
+		},
+		features: {
+			enumerable: true,
+			get: function () {
+				return props.features;
 			}
 		}
 	});

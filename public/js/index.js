@@ -724,6 +724,14 @@ $(function () {
 		});
 	});
 
+	quad.on('features', function (features) {
+		if (features.indexOf('camera') === -1) {
+			$('#camera').hide();
+		}
+
+		log('Available features: '+features.join(', '));
+	});
+
 	// Inject SVGs into HTML to be able to style and animate them
 	var svgs = $('img[src$=".svg"]');
 	SVGInjector(svgs, null, function () {
