@@ -431,13 +431,15 @@ function init(quad) {
 	});
 
 	$('#calibrate-sensor-btn').click(function () {
-		var calibration = {};
+		var calibration = $.extend(true, {}, quad.config.mpu6050.calibration);
 		var types = ['gyro', 'accel'];
 		for (var i = 0; i < types.length; i++) {
 			var type = types[i];
-			calibration[type] = {};
+			if (!calibration[type]) {
+				calibration[type] = { x: 0, y: 0, z: 0 };
+			}
 			for (var axis in quad.orientation[type]) {
-				calibration[type][axis] = - quad.orientation[type][axis];
+				calibration[type][axis] -= quad.orientation[type][axis];
 			}
 		}
 
