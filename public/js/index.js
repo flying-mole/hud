@@ -725,6 +725,12 @@ $(function () {
 	});
 
 	quad.on('features', function (features) {
+		if (features.indexOf('motors') === -1) {
+			log('Motors not available', 'error');
+		}
+		if (features.indexOf('imu') === -1) {
+			log('Inertial Measurement Unit not available', 'error');
+		}
 		if (features.indexOf('camera') === -1) {
 			$('#camera').hide();
 		}
