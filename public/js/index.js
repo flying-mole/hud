@@ -735,7 +735,9 @@ $(function () {
 			$('#camera').hide();
 		}
 
-		log('Available features: '+features.join(', '));
+		var featuresStr = features.join(', ');
+		if (!featuresStr) featuresStr = '(none)';
+		log('Available features: '+featuresStr);
 	});
 
 	// Inject SVGs into HTML to be able to style and animate them
