@@ -1,19 +1,19 @@
 module.exports = {
 	"physics": {
 		"gravity": 9.81, // cst
-		"motorMass": 50, // en grammes
-		"structureMass": 30, // en grammes
-		"diagonalLength": 45 // distance moteur-moteur en cm
+		"motorMass": 50, // in grams
+		"structureMass": 30, // in grams
+		"diagonalLength": 45 // motor-motor distance in cm
 	},
 	"mpu6050": {
-		"device": 1,
-		"address": "0x68",
-		"calibration": {}
+		"device": 1, // RaspberryPi I2C device (0 or 1)
+		"address": "0x68", // Sensor I2C address
+		"calibration": {} // Calibration data
 	},
 	"servos": {
-		"pins": [0, 1, 2, 3],
-		"range": [85, 140, 185],
-		"initPeriod": 100,
+		"pins": [0, 1, 2, 3], // ServoBlaster motor outputs
+		"range": [85, 140, 185], // Output period range
+		"initPeriod": 100, // ESC initialization period
 		"massToPeriod": [91.344803622, 0.0676439999, 0.0000557704991374891] // coeffs for cst, x and x²
 	},
 	"broadcastInterval": {
@@ -36,7 +36,7 @@ module.exports = {
 		}
 	},
 	"server": {
-		"port": 3000
+		"port": 3000 // HTTP server port
 	},
 	"camera": {
 		"preview": {

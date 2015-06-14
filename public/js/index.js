@@ -442,7 +442,7 @@ function init(quad) {
 		}
 
 		// z accel is 1, because of gravitation :-P
-		calibration.accel.z -= 1;
+		calibration.accel.z += 1;
 
 		quad.config.mpu6050.calibration = calibration;
 		sendCommand('config', quad.config);

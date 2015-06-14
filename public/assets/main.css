@@ -3,6 +3,20 @@ body {
 	font-family: "Ubuntu Mono",Menlo,Monaco,Consolas,"Courier New",monospace;
 	color: rgba(211, 211, 211, 0.5);
 }
+body::before {
+	content: " ";
+	display: block;
+	width: 200px;
+	height: 200px;
+	position: absolute;
+	top: 0;
+	right: -15px;
+	background-image: url("flying-mole.svg");
+	background-repeat: no-repeat;
+	background-size: contain;
+	transform: rotate(-15deg);
+	opacity: 0.3;
+}
 pre {
 	background: none;
 	border: none;
