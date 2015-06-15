@@ -8,6 +8,7 @@ var getColorForPercentage = colors.getForPercentage,
 	colorToRgb = colors.toRgb;
 
 var Quadcopter = require('./quadcopter');
+var keyBindings = require('./key-bindings');
 
 function Joystick(el, oninput) {
 	var that = this;
@@ -387,6 +388,8 @@ $(function () {
 })();
 
 function init(quad) {
+	keyBindings(quad);
+
 	var joystick = new Joystick('#direction-input', function (data) {
 		//sendCommand('orientation', data);
 		//TODO
@@ -501,7 +504,7 @@ $(function () {
 
 	// TODO: this is deprecated, use Quadcopter methods instead
 	window.sendCommand = function (cmd, opts) {
-		quad.client.send(cmd, opts);
+		quad.cmd.send(cmd, opts);
 	};
 
 	quad.on('error', function (msg) {

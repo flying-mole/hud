@@ -3,6 +3,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var MsgHandler = require('./msg-handler');
 var Client = require('./client');
+var CmdStream = require('./cmd-stream');
 
 function Quadcopter() {
 	EventEmitter.call(this);
@@ -27,7 +28,7 @@ function Quadcopter() {
 				return props.enabled;
 			},
 			set: function (val) {
-				that.client.send('enable', val);
+				that.cmd.send('enable', val);
 			}
 		},
 		pidEnabled: {
@@ -36,7 +37,7 @@ function Quadcopter() {
 				return props.pidEnabled;
 			},
 			set: function (val) {
-				that.client.send('pid-enable', val);
+				that.cmd.send('pid-enable', val);
 			}
 		},
 		config: {
@@ -45,7 +46,7 @@ function Quadcopter() {
 				return that._config;
 			},
 			set: function (val) {
-				that.client.send('config', val);
+				that.cmd.send('config', val);
 			}
 		},
 		power: {
@@ -54,7 +55,7 @@ function Quadcopter() {
 				return props.power;
 			},
 			set: function (val) {
-				that.client.send('power', val);
+				that.cmd.send('power', val);
 			}
 		},
 		orientation: {
@@ -63,7 +64,7 @@ function Quadcopter() {
 				return props.orientation;
 			},
 			set: function (val) {
-				that.client.send('orientation', val);
+				that.cmd.send('orientation', val);
 			}
 		},
 		rotationSpeed: {
@@ -72,7 +73,7 @@ function Quadcopter() {
 				return props.rotationSpeed;
 			},
 			set: function (val) {
-				that.client.send('rotation-speed', val);
+				that.cmd.send('rotation-speed', val);
 			}
 		},
 		motorsSpeed: {
@@ -91,6 +92,7 @@ function Quadcopter() {
 
 	this.msgHandler = new MsgHandler(this);
 	this.client = new Client(this);
+	this.cmd = new CmdStream(this.client);
 
 	this.client.on('message', function (msg) {
 		that.msgHandler.handle(msg);

@@ -7,7 +7,7 @@ function Client() {
 util.inherits(Client, EventEmitter);
 
 Client.prototype.connect = function (cb) {
-	if (this._ws) { // Already conected
+	if (this.socket) { // Already conected
 		return;
 	}
 
@@ -28,7 +28,7 @@ Client.prototype.connect = function (cb) {
 	});
 
 	ws.addEventListener('close', function () {
-		that._ws = null;
+		that.socket = null;
 		that.emit('disconnect');
 	});
 
@@ -37,19 +37,19 @@ Client.prototype.connect = function (cb) {
 		that.emit('message', msg);
 	});
 
-	that._ws = ws;
+	this.socket = ws;
 };
 
 Client.prototype.disconnect = function () {
-	if (!this._ws) { // Not conected
+	if (!this.socket) { // Not conected
 		return;
 	}
 
-	that._ws.close();
+	this.socket.close();
 };
 
 Client.prototype.send = function (cmd, opts) {
-	this._ws.send(BSON.serialize({
+	this.socket.send(BSON.serialize({
 		cmd: cmd,
 		opts: opts
 	}));

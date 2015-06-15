@@ -1,20 +1,16 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
 
-function CmdStream(socket) {
+function CmdStream(client) {
 	EventEmitter.call(this);
 
-	this.socket = socket;
+	this.client = client;
 }
 util.inherits(CmdStream, EventEmitter);
 
-CmdStream.prototype.write = function (cmd) {
-	this.emit('data', cmd);
-
-	this.socket.send(BSON.serialize({
-		cmd: cmd,
-		opts: opts
-	}));
+CmdStream.prototype.send = function (cmd, opts) {
+	this.emit(cmd, opts);
+	this.client.send(cmd, opts);
 };
 
 module.exports = CmdStream;
