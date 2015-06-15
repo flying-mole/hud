@@ -6,6 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/flying-mole/hud.git"
+  },
   "author": "emersion",
   "license": "MIT",
   "engines": {
@@ -24,7 +28,7 @@
     "extend": "^2.0.1",
     "i2c-bus": "^0.11.1",
     "i2c-mpu6050": "^2.2.0",
-    "node-pid-controller": "0.0.3",
+    "node-pid-controller": "emersion/node-pid-controller",
     "servoblaster": "^0.1.0"
   }
 }
