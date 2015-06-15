@@ -29,6 +29,7 @@ function Quadcopter() {
 			},
 			set: function (val) {
 				that.cmd.send('enable', val);
+				props.enabled = val;
 			}
 		},
 		pidEnabled: {
@@ -55,7 +56,11 @@ function Quadcopter() {
 				return props.power;
 			},
 			set: function (val) {
+				if (val < 0) val = 0;
+				if (val > 1) val = 1;
+
 				that.cmd.send('power', val);
+				props.power = val;
 			}
 		},
 		orientation: {
