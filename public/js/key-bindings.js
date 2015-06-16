@@ -24,6 +24,7 @@ module.exports = function (quad) {
 
 		// Second-class key bindings
 		// Ignored when an input is being focused
+		var handled = true;
 		switch (event.key) {
 			case 'ArrowDown':
 				quad.power -= 0.05;
@@ -32,9 +33,23 @@ module.exports = function (quad) {
 				quad.power += 0.05;
 				break;
 			default:
-				return;
+				handled = false;
+		}
+		if (handled) {
+			event.preventDefault();
+			return;
 		}
 
-		event.preventDefault();
+		// Keyboard shortcuts with Alt key
+		if (event.altKey) {
+			switch (event.key) {
+				case 's':
+					quad.enabled = !quad.enabled;
+					break;
+				default:
+					return;
+			}
+			event.preventDefault();
+		}
 	});
 };

@@ -537,7 +537,13 @@ $(function () {
 		schemas.sideY.setSpeed(speedsRatio.slice(2, 4));
 
 		var $stats = $('#motors-stats');
-		$stats.find('.motors-speed').html(speeds.join('<br>'));
+		var speedsList = speeds;
+		if (quad.config) {
+			speedsList = speeds.map(function (speed, i) {
+				return quad.config.servos.pins[i] + ': ' + speed;
+			});
+		}
+		$stats.find('.motors-speed').html(speedsList.join('<br>'));
 
 		var timestamp = new Date().getTime();
 		graphs.motors_speed_0.append(timestamp, speeds[0]);

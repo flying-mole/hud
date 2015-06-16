@@ -217,10 +217,10 @@ select {
 
 .quadcopter-schema {
 	fill: rgb(58, 58, 58);
-	transition: 0.3s transform;
+	transition: 0.2s transform;
 }
 .quadcopter-schema g {
-	transition: 0.3s fill;
+	transition: 0.2s fill;
 }
 #quadcopter-top {
 	width: 300px;
