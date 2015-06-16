@@ -3,7 +3,9 @@ module.exports = {
 		"gravity": 9.81, // cst
 		"motorMass": 50, // in grams
 		"structureMass": 30, // in grams
-		"diagonalLength": 45 // motor-motor distance in cm
+		"diagonalLength": 45, // motor-motor distance in cm
+		"boxHeight": 8, // distance between the axis and the center of gravity of the box in cm
+		"boxMass": 650 // mass of the box in grams
 	},
 	"mpu6050": {
 		"device": 1, // RaspberryPi I2C device (0 or 1)
@@ -18,7 +20,7 @@ module.exports = {
 	},
 	"broadcastInterval": {
 		"osStatus": 10,
-		"orientation": 1
+		"orientation": 0.2
 	},
 	"pid": {
 		"interval": 100,
