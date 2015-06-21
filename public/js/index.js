@@ -524,6 +524,17 @@ $(function () {
 	});
 
 	quad.on('motors-speed', function (speeds) {
+		if (quad.config) {
+			var range = quad.config.servos.range;
+			for (var i = 0; i < speeds.length; i++) {
+				var speed = speeds[i];
+				if (speed >= range[1]) {
+					// Max. motor power reached
+					log('Motor '+quad.config.servos.pins[i]+' is at full power!', 'error');
+				}
+			}
+		}
+
 		var speedsRatio = [0, 0, 0, 0];
 		if (quad.config) {
 			var range = quad.config.servos.range;
@@ -536,14 +547,13 @@ $(function () {
 		schemas.sideX.setSpeed(speedsRatio.slice(0, 2));
 		schemas.sideY.setSpeed(speedsRatio.slice(2, 4));
 
-		var $stats = $('#motors-stats');
 		var speedsList = speeds;
 		if (quad.config) {
 			speedsList = speeds.map(function (speed, i) {
 				return quad.config.servos.pins[i] + ': ' + speed;
 			});
 		}
-		$stats.find('.motors-speed').html(speedsList.join('<br>'));
+		$('#motors-stats .motors-speed').html(speedsList.join('<br>'));
 
 		var timestamp = new Date().getTime();
 		graphs.motors_speed_0.append(timestamp, speeds[0]);
@@ -552,6 +562,16 @@ $(function () {
 		graphs.motors_speed_3.append(timestamp, speeds[3]);
 
 		graphsExport.append('motors-speed', timestamp, speeds);
+	});
+
+	quad.on('motors-forces', function (forces) {
+		var forcesList = forces;
+		if (quad.config) {
+			var forcesList = forces.map(function (f, i) {
+				return quad.config.servos.pins[i] + ': ' + f;
+			});
+		}
+		$('#motors-stats .motors-forces').html(forcesList.join('<br>'));
 	});
 
 	quad.on('orientation', function (orientation) {

@@ -32,6 +32,10 @@ MsgHandler.prototype = {
 		this.quad._props.motorsSpeed = msg.speed;
 		this.quad.emit('motors-speed', msg.speed);
 	},
+	'motors-forces': function (msg) {
+		this.quad._props.motorsForces = msg.forces;
+		this.quad.emit('motors-forces', msg.forces);
+	},
 	orientation: function (msg) {
 		this.quad._props.orientation = msg.data;
 		this.quad.emit('orientation', msg.data);
