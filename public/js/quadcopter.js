@@ -33,15 +33,6 @@ function Quadcopter() {
 				props.enabled = val;
 			}
 		},
-		pidEnabled: {
-			enumerable: true,
-			get: function () {
-				return props.pidEnabled;
-			},
-			set: function (val) {
-				that.cmd.send('pid-enable', val);
-			}
-		},
 		config: {
 			enumerable: true,
 			get: function () {

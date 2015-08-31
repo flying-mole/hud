@@ -429,8 +429,9 @@ function init(quad) {
 		sendCommand('enable', $(this).prop('checked'));
 	});
 
-	$('#pid-switch').change(function () {
-		sendCommand('pid-enable', $(this).prop('checked'));
+	$('#controller-btn').change(function () {
+		quad.config.pid.controller = $(this).val();
+		sendCommand('config', quad.config);
 	});
 
 	$('#calibrate-sensor-btn').click(function () {
@@ -751,6 +752,9 @@ $(function () {
 		$camForm.find('[name="ISO"]').change(function () {
 			$('#ISO-switch').prop('checked', true);
 		});
+
+		// PID controller config
+		$('#controller-btn').val(cfg.pid.controller);
 	});
 
 	quad.on('features', function (features) {

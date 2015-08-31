@@ -36,12 +36,14 @@
 					<label for="power-switch">POWER</label>
 				</div>
 
-				<div>
-					<div class="switch">
-						<input type="checkbox" id="pid-switch" checked>
-						<label for="pid-switch"></label>
-					</div>
-					<label for="pid-switch">PID</label>
+				<div class="form-inline">
+					<label class="control-label" for="controller-btn">Controller:</label>
+					<select id="controller-btn" class="form-control">
+						<option>dummy</option>
+						<option>rate</option>
+						<option>rate-simple</option>
+						<option>stabilize-simple</option>
+					</select>
 				</div>
 			</div>
 			<div class="col-lg-6 col-xs-12">
