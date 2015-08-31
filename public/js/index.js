@@ -758,11 +758,15 @@ $(function () {
 	});
 
 	quad.on('features', function (features) {
+		var allGreen = true;
+
 		if (features.indexOf('motors') === -1) {
 			log('Motors not available', 'error');
+			allGreen = false;
 		}
 		if (features.indexOf('imu') === -1) {
 			log('Inertial Measurement Unit not available', 'error');
+			allGreen = false;
 		}
 		if (features.indexOf('camera') === -1) {
 			$('#camera').hide();
@@ -771,6 +775,10 @@ $(function () {
 		var featuresStr = features.join(', ');
 		if (!featuresStr) featuresStr = '(none)';
 		log('Available features: '+featuresStr);
+
+		if (allGreen) {
+			log('ALL GREEN!', 'success');
+		}
 	});
 
 	// Inject SVGs into HTML to be able to style and animate them

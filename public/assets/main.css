@@ -91,6 +91,9 @@ input[type="number"].form-control {
 #console .info {
 	color: rgb(0, 100, 200);
 }
+#console .success {
+	color: rgb(0, 100, 0);
+}
 
 .joystick {
 	position: relative;
