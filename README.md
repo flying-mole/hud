@@ -34,3 +34,20 @@ Related blog (in French): http://emersion.fr/blog
   * `server.js`: HTTP server
 * `public/`: browser code
 * `config.js`: persistent configuration
+
+## What happens when...
+
+> When I start the quadcopter?
+
+* A web server is started on the Raspberry Pi. You can access it using your web browser and a nice user interface will show up.
+* Checks are performed to know which hardware components are available: motors, sensors, camera...
+
+> When I increase the main power?
+
+The quacopter is on ground. When you increase the main power, all motors will begin to rotate.
+
+When on air, the quadcopter runs a controller which stabilizes the machine. At a predefinied rate, the quadcopter will gather data from sensors and give it to the controller. The controller has a target angle for each axis, which is set to 0 by default, which means the quadcopter tries to remain horizontal. The controller will compute the correction that needs to be applied to the motor speeds to reach the target, and give it back. Then, the quacopter will send appropriate commands to each motor.
+
+> When I move my joystick to the right?
+
+First of all, your joystick move is detected and interpreted as a command to increase the x axis angle. A message is sent from the browser to the server on the Raspberry Pi to say: _Hey! Increase the x angle to 10 degrees!_. The server then receives this message and changes the controller target for the x angle from 0 to 10 degrees. The controller, which is executed at a fixed rate, will take into account this change and update the motor speeds accordingly. The quadcopter will begin to move to the right.
