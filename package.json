@@ -14,7 +14,7 @@
   "author": "emersion",
   "license": "MIT",
   "engines": {
-    "node": "^0.12"
+    "node": "^4.0"
   },
   "dependencies": {
     "bson": "^0.3.1",
