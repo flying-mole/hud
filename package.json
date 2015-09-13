@@ -17,7 +17,7 @@
     "node": "^4.0"
   },
   "dependencies": {
-    "browserify-lite": "emersion/browserify-lite",
+    "browserify-lite": "^0.4.0",
     "bson": "^0.3.1",
     "events": "^1.0.2",
     "express": "^4.12.3",
