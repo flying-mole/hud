@@ -391,9 +391,7 @@ function init(quad) {
 	keyBindings(quad);
 
 	var joystick = new Joystick('#direction-input', function (data) {
-		//sendCommand('orientation', data);
-		//TODO
-		sendCommand('rotation-speed', {
+		sendCommand('orientation', {
 			x: data.beta,
 			y: data.gamma,
 			z: data.alpha

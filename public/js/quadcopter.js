@@ -64,15 +64,6 @@ function Quadcopter() {
 				that.cmd.send('orientation', val);
 			}
 		},
-		rotationSpeed: {
-			enumerable: true,
-			get: function () {
-				return props.rotationSpeed;
-			},
-			set: function (val) {
-				that.cmd.send('rotation-speed', val);
-			}
-		},
 		motorsSpeed: {
 			enumerable: true,
 			get: function () {
