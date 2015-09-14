@@ -22,19 +22,6 @@ Related blog (in French): http://emersion.fr/blog
 
 ![screen shot 2015-05-16 at 15 20 04](https://cloud.githubusercontent.com/assets/506932/7666273/71269f0c-fbdf-11e4-9a5f-0e79fe2a8a11.png)
 
-## General structure
-
-* `lib/`: Raspberry Pi code
-  * `controllers/`: available stabilizers
-  * `camera.js`: Raspberry Pi Camera support
-  * `msg-builder.js`: creates messages for the client
-  * `msg-handler.js`: handles messages sent by the client
-  * `quadcopter.js`: main module
-  * `sensors.js`: Inertial Mesurement Unit support
-  * `server.js`: HTTP server
-* `public/`: browser code
-* `config.js`: persistent configuration
-
 ## Setup
 
 The HUD will work on the Raspberry Pi as well as on your desktop/laptop, even if sensors/motors/camera are not available. It requires Node >= 4.0.
@@ -48,6 +35,19 @@ Start the HUD:
 ```
 npm start
 ```
+
+## General structure
+
+* `lib/`: Raspberry Pi code
+  * `controllers/`: available stabilizers
+  * `camera.js`: Raspberry Pi Camera support
+  * `msg-builder.js`: creates messages for the client
+  * `msg-handler.js`: handles messages sent by the client
+  * `quadcopter.js`: main module
+  * `sensors.js`: Inertial Mesurement Unit support
+  * `server.js`: HTTP server
+* `public/`: browser code
+* `config.js`: persistent configuration
 
 ## What happens when...
 
