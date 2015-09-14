@@ -40,7 +40,7 @@
 					<label class="control-label" for="controller-btn">Controller:</label>
 					<select id="controller-btn" class="form-control">
 						<option>dummy</option>
-						<option>rate</option>
+						<!-- <option>rate</option> -->
 						<option>rate-simple</option>
 						<option>stabilize-simple</option>
 						<option>physics</option>
@@ -134,6 +134,16 @@
 			<div class="col-lg-4 col-xs-12 graph-ctn">
 				<strong>Motors speed</strong>
 				<canvas id="motors-speed-graph" width="400" height="100"></canvas>
+			</div>
+			<div class="col-lg-4 col-xs-12">
+				<strong>Graphs settings</strong>
+				<div class="form-inline">
+					<label class="control-label" for="graph-axes-btn">Show axes:</label>
+					<select id="graph-axes-btn" class="form-control">
+						<option value="*">x, y, z</option>
+						<option>x</option>
+					</select>
+				</div>
 			</div>
 		</div>
 	</div>

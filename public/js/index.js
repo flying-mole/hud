@@ -484,6 +484,19 @@ function init(quad) {
 		var url = URL.createObjectURL(blob);
 		window.open(url);
 	});
+
+	$('#graph-axes-btn').change(function () {
+		var val = $(this).val();
+
+		var axes;
+		if (val == '*') {
+			axes = null;
+		} else {
+			axes = [val];
+		}
+
+		graphs.axes = axes;
+	});
 }
 
 $(function () {
@@ -598,18 +611,20 @@ $(function () {
 		// Graphs
 		var timestamp = new Date().getTime();
 
-		graphs.gyro_x.append(timestamp, orientation.gyro.x);
-		graphs.gyro_y.append(timestamp, orientation.gyro.y);
-		graphs.gyro_z.append(timestamp, orientation.gyro.z);
+		function appendAxes(graphName, data) {
+			var axes = graphs.axes || ['x', 'y', 'z'];
 
-		graphs.accel_x.append(timestamp, orientation.accel.x);
-		graphs.accel_y.append(timestamp, orientation.accel.y);
-		graphs.accel_z.append(timestamp, orientation.accel.z);
+			for (var i = 0; i < axes.length; i++) {
+				var axis = axes[i];
+				if (typeof data[axis] == 'undefined') continue;
+				graphs[graphName+'_'+axis].append(timestamp, data[axis]);
+			}
+		}
 
-		graphs.rotation_x.append(timestamp, orientation.rotation.x);
-		graphs.rotation_y.append(timestamp, orientation.rotation.y);
-		//graphs.rotation_z.append(timestamp, orientation.rotation.z);
-		
+		appendAxes('gyro', orientation.gyro);
+		appendAxes('accel', orientation.accel);
+		appendAxes('rotation', orientation.rotation);
+
 		for (var name in orientation) {
 			graphsExport.append(name, timestamp, orientation[name]);
 		}
