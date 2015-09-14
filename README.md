@@ -35,6 +35,20 @@ Related blog (in French): http://emersion.fr/blog
 * `public/`: browser code
 * `config.js`: persistent configuration
 
+## Setup
+
+The HUD will work on the Raspberry Pi as well as on your desktop/laptop, even if sensors/motors/camera are not available. It requires Node >= 4.0.
+
+Install dependencies:
+```
+npm install
+```
+
+Start the HUD:
+```
+npm start
+```
+
 ## What happens when...
 
 > When I start the quadcopter?
