@@ -466,6 +466,30 @@ function init(quad) {
 		});
 	});
 
+	var sineInterval, sineStartedAt;
+	$('#direction-sine').submit(function (event) {
+		event.preventDefault();
+
+		var data = $(this).serializeObject();
+		var A = data.amplitude,
+			f = data.frequency,
+			phi = data.offset;
+
+		clearInterval(sineInterval);
+
+		sineStartedAt = (new Date()).getTime();
+		sineInterval = setInterval(function () {
+			var t = ((new Date()).getTime() - sineStartedAt) / 1000;
+			var cmd = { x: 0, y: 0, z: 0 };
+			cmd[data.axis] = A * Math.sin(2 * Math.PI * f * t + phi);
+			console.log(cmd);
+			sendCommand('orientation', cmd);
+		}, 200);
+	});
+	$('#direction-sine-stop').click(function () {
+		clearInterval(sineInterval);
+	});
+
 	$('#calibrate-sensor-btn').click(function () {
 		var calibration = $.extend(true, {}, quad.config.mpu6050.calibration);
 		var types = ['gyro', 'accel'];
