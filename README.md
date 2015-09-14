@@ -22,6 +22,20 @@ Related blog (in French): http://emersion.fr/blog
 
 ![screen shot 2015-05-16 at 15 20 04](https://cloud.githubusercontent.com/assets/506932/7666273/71269f0c-fbdf-11e4-9a5f-0e79fe2a8a11.png)
 
+## Setup
+
+The HUD will work on the Raspberry Pi as well as on your desktop/laptop, even if sensors/motors/camera are not available. It requires Node >= 4.0.
+
+Install dependencies:
+```
+npm install
+```
+
+Start the HUD:
+```
+npm start
+```
+
 ## General structure
 
 * `lib/`: Raspberry Pi code
