@@ -32,24 +32,15 @@ module.exports = function (quad) {
 			case 'ArrowUp':
 				quad.power += 0.05;
 				break;
+			case 's':
+				quad.enabled = !quad.enabled;
+				break;
 			default:
 				handled = false;
 		}
 		if (handled) {
 			event.preventDefault();
 			return;
-		}
-
-		// Keyboard shortcuts with Alt key
-		if (event.altKey) {
-			switch (event.key) {
-				case 's':
-					quad.enabled = !quad.enabled;
-					break;
-				default:
-					return;
-			}
-			event.preventDefault();
 		}
 	});
 };
