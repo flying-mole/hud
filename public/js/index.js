@@ -10,6 +10,18 @@ var getColorForPercentage = colors.getForPercentage,
 var Quadcopter = require('./quadcopter');
 var keyBindings = require('./key-bindings');
 
+$.fn.serializeObject = function () {
+	var arr = this.serializeArray();
+	var obj = {};
+
+	for (var i = 0; i < arr.length; i++) {
+		var item = arr[i];
+		obj[item.name] = item.value;
+	}
+
+	return obj;
+};
+
 function Joystick(el, oninput) {
 	var that = this;
 
@@ -432,6 +444,28 @@ function init(quad) {
 		sendCommand('config', quad.config);
 	});
 
+	$('#direction-type-btn').change(function () {
+		var selected = $(this).val();
+		
+		$(this).children('option').each(function (option) {
+			var inputType = $(this).text();
+
+			$('#direction-'+inputType).toggle(inputType == selected);
+		});
+	}).change();
+
+	$('#direction-step').submit(function (event) {
+		event.preventDefault();
+
+		var data = $(this).serializeObject();
+
+		sendCommand('orientation', {
+			x: data.x,
+			y: data.y,
+			z: data.z
+		});
+	});
+
 	$('#calibrate-sensor-btn').click(function () {
 		var calibration = $.extend(true, {}, quad.config.mpu6050.calibration);
 		var types = ['gyro', 'accel'];
@@ -496,7 +530,7 @@ function init(quad) {
 		}
 
 		graphs.axes = axes;
-	});
+	}).change();
 }
 
 $(function () {

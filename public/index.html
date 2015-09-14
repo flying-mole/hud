@@ -70,9 +70,43 @@
 				</div>
 			</div>
 			<div class="col-lg-3 col-xs-6 hidden-xs hidden-sm text-center">
-				<strong>Direction</strong>
-				<div id="direction-input" class="joystick">
-					<div class="handle"></div>
+				<div class="form-inline">
+					<label class="control-label" for="direction-type-btn">Direction input type:</label>
+					<select id="direction-type-btn" class="form-control">
+						<option>custom</option>
+						<option>step</option>
+						<option>sine</option>
+					</select>
+				</div>
+
+				<div id="direction-custom">
+					<strong>Direction: custom</strong>
+					<div id="direction-input" class="joystick">
+						<div class="handle"></div>
+					</div>
+				</div>
+				
+
+				<form id="direction-step" class="form-inline">
+					<strong>Direction: step</strong>
+					<div>
+						x: <input type="number" name="x" value="0" step="any" class="form-control"> °
+					</div>
+					<div>
+						y: <input type="number" name="y" value="0" step="any" class="form-control"> °
+					</div>
+					<div>
+						z: <input type="number" name="z" value="0" step="any" class="form-control"> °
+					</div>
+
+					<br>
+					<button type="submit" class="btn btn-primary">Send</button>
+					<button type="reset" class="btn btn-default">Reset</button>
+				</form>
+
+				<div id="direction-sine">
+					<strong>Direction: sine</strong>
+					Not implemented.
 				</div>
 			</div>
 			<div class="col-lg-2 col-xs-6 text-center" title="Arrow up/down">
