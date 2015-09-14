@@ -5,7 +5,8 @@ module.exports = {
 		"structureMass": 30, // in grams
 		"diagonalLength": 45, // motor-motor distance in cm
 		"boxHeight": 8, // distance between the axis and the center of gravity of the box in cm
-		"boxMass": 650 // mass of the box in grams
+		"boxMass": 650, // mass of the box in grams
+		"linearRegressionForce" : 0.13 // Regression linéaire de la force de la seconde expèrience, 
 	},
 	"mpu6050": {
 		"device": 1, // RaspberryPi I2C device (0 or 1)
@@ -32,7 +33,7 @@ module.exports = {
 				"z": [0, 0, 0]
 			},
 			"stabilize": {
-				"x": [0.001, 0, 0],
+				"x": [2, 0.1, 0],
 				"y": [0, 0, 0],
 				"z": [0, 0, 0]
 			}
