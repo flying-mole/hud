@@ -244,3 +244,7 @@ select {
 	max-width: 100%;
 	display: block;
 }
+
+.motors-forces {
+	white-space: nowrap;
+}
