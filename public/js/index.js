@@ -626,10 +626,14 @@ $(function () {
 		$('#motors-stats .motors-speed').html(speedsList.join('<br>'));
 
 		var timestamp = new Date().getTime();
-		graphs.motors_speed_0.append(timestamp, speeds[0]);
-		graphs.motors_speed_1.append(timestamp, speeds[1]);
-		graphs.motors_speed_2.append(timestamp, speeds[2]);
-		graphs.motors_speed_3.append(timestamp, speeds[3]);
+		if (!graphs.axes || graphs.axes.indexOf('x') >= 0) {
+			graphs.motors_speed_0.append(timestamp, speeds[0]);
+			graphs.motors_speed_2.append(timestamp, speeds[2]);
+		}
+		if (!graphs.axes || graphs.axes.indexOf('y') >= 0) {
+			graphs.motors_speed_1.append(timestamp, speeds[1]);
+			graphs.motors_speed_3.append(timestamp, speeds[3]);
+		}
 
 		graphsExport.append('motors-speed', timestamp, speeds);
 	});
