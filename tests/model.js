@@ -21,6 +21,10 @@ class Model {
 			temp: 0
 		};
 	}
+
+	reset() {
+		this.t = 0;
+	}
 }
 
 module.exports = Model;

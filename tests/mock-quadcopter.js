@@ -27,7 +27,9 @@ class MockQuadcopter extends Quadcopter {
 			if (err) console.error(err);
 
 			// Update model time variable
-			that.model.t += (Date.now() - startTime) + that.config.pid.interval;
+			that.model.t += (Date.now() - startTime) + that.config.controller.interval;
+
+			that.emit('stabilize');
 
 			process.nextTick(function () {
 				that._stabilizeLoop();

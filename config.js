@@ -23,10 +23,10 @@ module.exports = {
 		"osStatus": 10,
 		"orientation": 0.2
 	},
-	"pid": {
+	"controller": {
 		"interval": 100,
-		"controller": "dummy",
-		"values": { // cst for PIDs: [k_P, k_I, k_D]
+		"updater": "dummy",
+		"pid": { // cst for PIDs: [k_P, k_I, k_D]
 			"rate": {
 				"x": [0.001, 0, 0],
 				"y": [0, 0, 0],
@@ -94,5 +94,6 @@ module.exports = {
 			"framerate": null
 		},
 		"previewWhenRecording": false
-	}
+	},
+	"debug": true
 };
