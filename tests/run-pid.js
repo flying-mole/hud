@@ -13,6 +13,8 @@ var pidRanges = {
 	}
 };
 var pidType = 'stabilize';
+var timeout = 60 * 1000; // 1min
+var target = { x: 10, y: 0, z: 0 };
 
 config.controller.pid[pidType].x[0] = pidRanges.x.from;
 config.controller.pid[pidType].x[1] = 0;
@@ -26,14 +28,18 @@ quad.start().then(function () {
 		console.log('Testing PID:', quad.config.controller.pid[pidType]);
 
 		// Start the quad
+		quad.ctrl.setTarget(target);
 		quad.enabled = true;
 		quad.power = 0.5;
 
 		quad.on('stabilize', function () {
 			var t = model.t;
 
-			if (t > 60 * 1000) {
-				console.log('Finished.');
+			var timeoutReached = (t > timeout);
+			var targetReached = (Math.abs(quad.orientation.rotation.x - target.x) / target.x < 0.05);
+
+			if (timeoutReached || targetReached) {
+				console.log('Finished:', timeoutReached ? 'timeout' : 'target');
 
 				quad.enabled = false;
 				model.reset();

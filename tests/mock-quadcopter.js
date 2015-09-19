@@ -26,8 +26,9 @@ class MockQuadcopter extends Quadcopter {
 		this._stabilize(function (err) {
 			if (err) console.error(err);
 
-			// Update model time variable
+			// Update model variables
 			that.model.t += (Date.now() - startTime) + that.config.controller.interval;
+			that.model.motorsForces = that.motorsForces;
 
 			that.emit('stabilize');
 
