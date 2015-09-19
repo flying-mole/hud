@@ -4,12 +4,12 @@ class Model {
 	constructor(config) {
 		this.config = config; // Quadcopter config
 
-		this.t = 0;
-		this.motorsSpeed = null;
+		this.t = 0; // Current time in ms
+		this.motorsForces = [0, 0, 0, 0]; // Motors forces in Newtons
 	}
 
 	get orientation() {
-		// TODO: compute orientation based on this.t and this.motorsSpeed
+		// TODO: compute orientation based on this.t and this.motorsForces
 
 		return {
 			accel: { x: 0, y: 0, z: 0 },
