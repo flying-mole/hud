@@ -14,6 +14,7 @@ class MockQuadcopter extends Quadcopter {
 	}
 
 	_setMotorsSpeeds(speeds) {
+		this._motorsSpeed = speeds;
 		this.model.motorsSpeed = speeds;
 	}
 
@@ -22,12 +23,11 @@ class MockQuadcopter extends Quadcopter {
 
 		if (!this._started) return;
 
-		var startTime = Date.now();
 		this._stabilize(function (err) {
 			if (err) console.error(err);
 
 			// Update model variables
-			that.model.t += (Date.now() - startTime) + that.config.controller.interval;
+			that.model.t += that.config.controller.interval;
 			if (that.motorsForces) {
 				that.model.motorsForces = that.motorsForces;
 			}

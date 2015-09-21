@@ -75,6 +75,7 @@ class Model {
 
 	reset() {
 		this.t = 0;
+		this.lastFrame = 0;
 	}
 }
 

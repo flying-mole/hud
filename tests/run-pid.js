@@ -3,15 +3,27 @@ var MockQuadcopter = require('./mock-quadcopter');
 var Model = require('./model');
 var config = require('../config');
 
-var pidRanges = {
-	x: {
-		from: 0.001,
-		to: 5,
+var pidRanges = [
+	{
+		from: 0.1, // 0.1,
+		to: 20,//5,
+		next: function (k) { return k * 1.1; }
+		//next: function (k) { return k + 0.1; }
+	},
+	{
+		from: 0.01, // 0.01,
+		to: 10,//1,
+		next: function (k) { return k * 1.1; }
+		//next: function (k) { return k + 0.01; }
+	},
+	{
+		from: 0.01,
+		to: 10,
 		next: function (k) { return k * 1.1; }
 	}
-};
+];
 var pidType = 'stabilize';
-var timeout = 60 * 1000; // 1min
+var timeout = 30 * 1000; // in ms
 var target = { x: 10, y: 0, z: 0 }; // Step
 
 var results = [];
@@ -20,91 +32,104 @@ var results = [];
 config.debug = false;
 config.controller.updater = 'stabilize-simple';
 
-config.controller.pid[pidType].x[0] = pidRanges.x.from;
-config.controller.pid[pidType].x[1] = 0;
-config.controller.pid[pidType].x[2] = 0;
+function resetPidValue(i) {
+	config.controller.pid[pidType].x[i] = pidRanges[i].from;
+}
+
+function nextPidValue(i) {
+	if (config.controller.pid[pidType].x[i] > pidRanges[i].to) {
+		return false;
+	}
+
+	config.controller.pid[pidType].x[i] = pidRanges[i].next(config.controller.pid[pidType].x[i]);
+	return true;
+}
+
+resetPidValue(0); // K_p
+resetPidValue(1); // K_i
+resetPidValue(2); // K_d
 
 var model = new Model(config);
 var quad = new MockQuadcopter(config, model);
 
 quad.start().then(function () {
+	var output = [];
+
+	quad.on('stabilize', function () {
+		var t = model.t;
+		var orientation = quad.orientation;
+		var x = orientation.rotation.x;
+
+		//console.log(quad.motorsSpeed, quad.motorsForces, quad.orientation.rotation);
+
+		output.push({
+			t: t,
+			x: x
+		});
+
+		if (t > timeout) {
+			// Is value in 5% of target?
+			function targetReached(x) {
+				return (Math.abs(x - target.x) / target.x < 0.05);
+			}
+
+			var respTime = 0;
+			for (var i = output.length - 1; i >= 0; i--) {
+				var item = output[i];
+
+				if (!targetReached(item.x)) {
+					respTime = item.t;
+					break;
+				}
+			}
+			output = [];
+
+			//console.log('Finished:', 'respTime='+respTime);
+
+			results.push({
+				pid: extend(true, [], config.controller.pid[pidType].x),
+				responseTime: respTime
+			});
+
+			quad.enabled = false;
+			model.reset();
+
+			// Update PID values
+			if (!nextPidValue(0)) {
+				resetPidValue(0);
+
+				console.log('Testing:', config.controller.pid[pidType].x);
+
+				if (!nextPidValue(1)) {
+					resetPidValue(1);
+
+					if (!nextPidValue(2)) {
+						resetPidValue(2);
+
+						console.log('Done!');
+						
+						results.sort(function (a, b) {
+							return a.responseTime - b.responseTime;
+						});
+
+						console.log(results.splice(0, 20));
+						process.exit();
+					}
+				}
+			}
+
+			quad.config = config;
+			next();
+		}
+	});
+
 	function next() {
-		console.log('Testing PID:', quad.config.controller.pid[pidType]);
+		//console.log('Testing PID:', quad.config.controller.pid[pidType].x);
 
 		// Start the quad
 		quad.ctrl.setTarget(target);
 		quad.enabled = true;
 		quad.power = 0.5;
-
-		var overshoot = 0;
-		var last = { x: 0, dx: 0 };
-		var lastOvershoots = [0, 0];
-
-		// Is value in 5% of target?
-		var targetReachedBy = function (x) {
-			return (Math.abs(x - target.x) / target.x < 0.05);
-		};
-
-		quad.on('stabilize', function () {
-			var t = model.t;
-			var x = quad.orientation.rotation.x;
-
-			// Global overshoot
-			if (x > overshoot) {
-				overshoot = x;
-			}
-
-			// Last minor overshoots
-			var dx = x - last.x;
-			if (last.dx != 0 && dx * last.dx < 0) { // Just changed sign of dx
-				if (last.dx > 0) { // dx < 0
-					lastOvershoots[1] = x;
-				} else {
-					lastOvershoots[0] = x;
-				}
-			}
-			last.x = x;
-			last.dx = dx;
-
-			var timeoutReached = (t > timeout);
-			var targetReached = targetReachedBy(x);
-
-			// Check that the are no overshoots outside 5%
-			// TODO: not working
-			if (targetReached && lastOvershoots[0]) {
-				targetReached = targetReachedBy(lastOvershoots[0]);
-			}
-			if (targetReached && lastOvershoots[1]) {
-				targetReached = targetReachedBy(lastOvershoots[1]);
-			}
-
-			if (timeoutReached || targetReached) {
-				console.log('Finished:', (timeoutReached) ? 'timeout' : 'target', 't='+t, 'max='+overshoot, lastOvershoots);
-
-				results.push({
-					pid: extend(true, {}, config.controller.pid[pidType]),
-					targetReached: targetReached,
-					t: t,
-					overshoot: overshoot,
-					lastOvershoots: lastOvershoots
-				});
-
-				quad.enabled = false;
-				model.reset();
-
-				// Update PID params
-				config.controller.pid[pidType].x[0] = pidRanges.x.next(config.controller.pid[pidType].x[0]);
-				quad.config = config;
-
-				if (config.controller.pid[pidType].x[0] > pidRanges.x.to) {
-					console.log('Done!');
-					process.exit();
-				} else {
-					next();
-				}
-				return;
-			}
-		});
 	}
 
 	next();
