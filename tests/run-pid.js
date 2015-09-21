@@ -1,3 +1,4 @@
+var fs = require('fs');
 var extend = require('extend');
 var MockQuadcopter = require('./mock-quadcopter');
 var Model = require('./model');
@@ -5,21 +6,21 @@ var config = require('../config');
 
 var pidRanges = [
 	{
-		from: 0.1, // 0.1,
-		to: 20,//5,
-		next: function (k) { return k * 1.1; }
+		from: 1,// 0.1,
+		to: 20,
+		next: function (k) { return k * 1.2; }
 		//next: function (k) { return k + 0.1; }
 	},
 	{
-		from: 0.01, // 0.01,
-		to: 10,//1,
-		next: function (k) { return k * 1.1; }
+		from: 0.01,
+		to: 0.1,
+		next: function (k) { return k * 1.2; }
 		//next: function (k) { return k + 0.01; }
 	},
 	{
 		from: 0.01,
-		to: 10,
-		next: function (k) { return k * 1.1; }
+		to: 0.1,
+		next: function (k) { return k * 1.2; }
 	}
 ];
 var pidType = 'stabilize';
@@ -56,6 +57,8 @@ quad.start().then(function () {
 	var output = [];
 
 	quad.on('stabilize', function () {
+		if (!quad.enabled) return;
+
 		var t = model.t;
 		var orientation = quad.orientation;
 		var x = orientation.rotation.x;
@@ -104,16 +107,25 @@ quad.start().then(function () {
 					resetPidValue(1);
 
 					if (!nextPidValue(2)) {
-						resetPidValue(2);
+						quad.stop();
 
 						console.log('Done!');
-						
-						results.sort(function (a, b) {
-							return a.responseTime - b.responseTime;
-						});
 
-						console.log(results.splice(0, 20));
-						process.exit();
+						var csv = 'k_p,k_i,k_d,responseTime\n';
+						results.forEach(function (item) {
+							csv += item.pid.join(',')+','+item.responseTime+'\n';
+						});
+						console.log('Writing file...', csv.length, 'bytes');
+						fs.writeFile('output.csv', csv, function (err) {
+							if (err) console.log(err);
+							
+							console.log(results.sort(function (a, b) {
+								return a.responseTime - b.responseTime;
+							}).splice(0, 20));
+
+							process.exit();
+						});
+						return;
 					}
 				}
 			}
