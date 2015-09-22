@@ -95,6 +95,8 @@ function getProgress() {
 	return Math.round(progress * 10000) / 10000;
 }
 
+var startTime = Date.now();
+
 var model = new Model(config);
 var quad = new MockQuadcopter(config, model);
 
@@ -171,7 +173,9 @@ quad.start().then(function () {
 						/*console.log(results.sort(function (a, b) {
 							return a.responseTime - b.responseTime;
 						}).splice(0, 20));*/
-						console.log('Done!');
+
+						console.log('Done after '+Math.round((Date.now() - startTime) / 1000)+'s');
+
 						process.exit();
 					});
 					return;
