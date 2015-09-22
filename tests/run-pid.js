@@ -18,40 +18,88 @@ var pidRanges = [
 		//next: function (k) { return k + 0.01; }
 	},
 	{
-		from: 0.01,
-		to: 0.1,
+		from: 0, //0.01,
+		to: 0, //0.1,
 		next: function (k) { return k * 1.2; }
 	}
 ];
-var pidType = 'stabilize';
 var timeout = 30 * 1000; // in ms
 var target = { x: 10, y: 0, z: 0 }; // Step
 
-var results = [];
+var pidType;
+function resetPidType() {
+	pidType = 'stabilize';
+}
+function nextPidType() {
+	if (pidType == 'stabilize') {
+		pidType = 'rate';
+		return true;
+	} else {
+		return false;
+	}
+}
+resetPidType();
 
 // Set quad config
 config.debug = false;
 config.controller.updater = 'stabilize-simple';
 
-function resetPidValue(i) {
-	config.controller.pid[pidType].x[i] = pidRanges[i].from;
+function resetPidValue(i, type) {
+	config.controller.pid[type || pidType].x[i] = pidRanges[i].from;
 }
-
+function resetAllPidValues(type) {
+	[0, 1, 2].forEach(function (i) {
+		resetPidValue(i, type);
+	});
+}
 function nextPidValue(i) {
-	if (config.controller.pid[pidType].x[i] > pidRanges[i].to) {
+	if (config.controller.pid[pidType].x[i] >= pidRanges[i].to) {
 		return false;
 	}
 
 	config.controller.pid[pidType].x[i] = pidRanges[i].next(config.controller.pid[pidType].x[i]);
 	return true;
 }
+function nextAllPidValues() {
+	var i = 0;
+	while (!nextPidValue(i)) {
+		resetPidValue(i);
 
-resetPidValue(0); // K_p
-resetPidValue(1); // K_i
-resetPidValue(2); // K_d
+		i++;
+
+		if (i >= 3) { // All PID values tested
+			return false;
+		}
+	}
+	return true;
+}
+
+resetAllPidValues('stabilize');
+resetAllPidValues('rate');
+
+// Progress
+function getPidValueProgress(i, type) {
+	var dist = pidRanges[i].to - pidRanges[i].from;
+	if (dist == 0) return 1;
+	return (config.controller.pid[type || pidType].x[i] - pidRanges[i].from) / dist;
+}
+function getProgress() {
+	var progress = 0;
+	for (var i = 0; i < 3; i++) {
+		progress += getPidValueProgress(i, 'stabilize') / (10000 * i);
+	}
+	for (var i = 0; i < 3; i++) {
+		progress += getPidValueProgress(i, 'rate') / (10000 * (i + 3));
+	}
+	progress /= 8;
+	return Math.round(progress * 10000) / 10000;
+}
 
 var model = new Model(config);
 var quad = new MockQuadcopter(config, model);
+
+var results = [];
+var progress = 0;
 
 quad.start().then(function () {
 	var output = [];
@@ -90,7 +138,10 @@ quad.start().then(function () {
 			//console.log('Finished:', 'respTime='+respTime);
 
 			results.push({
-				pid: extend(true, [], config.controller.pid[pidType].x),
+				pid: {
+					rate: extend(true, [], config.controller.pid.rate.x),
+					stabilize: extend(true, [], config.controller.pid.stabilize.x)
+				},
 				responseTime: respTime
 			});
 
@@ -98,36 +149,42 @@ quad.start().then(function () {
 			model.reset();
 
 			// Update PID values
-			if (!nextPidValue(0)) {
-				resetPidValue(0);
+			if (!nextAllPidValues()) {
+				resetAllPidValues();
+				nextPidType();
 
-				console.log('Testing:', config.controller.pid[pidType].x);
+				if (!nextAllPidValues()) {
+					quad.stop();
 
-				if (!nextPidValue(1)) {
-					resetPidValue(1);
+					console.log('Finished!');
+					console.log('Generating output file...');
 
-					if (!nextPidValue(2)) {
-						quad.stop();
+					var csv = 'stabilize_p,stabilize_i,stabilize_d,rate_p,rate_i,rate_d,responseTime\n';
+					results.forEach(function (item) {
+						csv += item.pid.stabilize.join(',')+','+item.pid.rate.join(',')+','+item.responseTime+'\n';
+					});
 
+					console.log('Writing file...', csv.length, 'bytes');
+					fs.writeFile('output.csv', csv, function (err) {
+						if (err) console.log(err);
+
+						/*console.log(results.sort(function (a, b) {
+							return a.responseTime - b.responseTime;
+						}).splice(0, 20));*/
 						console.log('Done!');
-
-						var csv = 'k_p,k_i,k_d,responseTime\n';
-						results.forEach(function (item) {
-							csv += item.pid.join(',')+','+item.responseTime+'\n';
-						});
-						console.log('Writing file...', csv.length, 'bytes');
-						fs.writeFile('output.csv', csv, function (err) {
-							if (err) console.log(err);
-							
-							console.log(results.sort(function (a, b) {
-								return a.responseTime - b.responseTime;
-							}).splice(0, 20));
-
-							process.exit();
-						});
-						return;
-					}
+						process.exit();
+					});
+					return;
 				}
+
+				resetPidType();
+			}
+
+			// Progress
+			var newProgress = getProgress();
+			if (progress != newProgress) {
+				progress = newProgress;
+				console.log('Progress:', getPidValueProgress(2, 'rate'), getPidValueProgress(1, 'rate'), getPidValueProgress(0, 'rate'), getPidValueProgress(2, 'stabilize'), getPidValueProgress(1, 'stabilize'), getPidValueProgress(0, 'stabilize'));
 			}
 
 			quad.config = config;
