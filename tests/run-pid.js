@@ -4,27 +4,49 @@ var MockQuadcopter = require('./mock-quadcopter');
 var Model = require('./model');
 var config = require('../config');
 
-var pidRanges = [
-	{
-		from: 1,// 0.1,
-		to: 20,
-		next: function (k) { return k * 1.2; }
-		//next: function (k) { return k + 0.1; }
-	},
-	{
-		from: 0.01,
-		to: 0.1,
-		next: function (k) { return k * 1.2; }
-		//next: function (k) { return k + 0.01; }
-	},
-	{
-		from: 0, //0.01,
-		to: 0, //0.1,
-		next: function (k) { return k * 1.2; }
-	}
-];
+var pidRanges = {
+	stabilize: [
+		{
+			from: 1,// 0.1,
+			to: 20,
+			next: function (k) { return k * 1.2; }
+			//next: function (k) { return k + 0.1; }
+		},
+		{
+			from: 0.01,
+			to: 0.1,
+			next: function (k) { return k * 1.2; }
+			//next: function (k) { return k + 0.01; }
+		},
+		{
+			from: 0, //0.01,
+			to: 0, //0.1,
+			next: function (k) { return k * 1.2; }
+		}
+	],
+	rate: [
+		{
+			from: 0.001,
+			to: 0.1,
+			next: function (k) { return k * 1.2; }
+			//next: function (k) { return k + 0.1; }
+		},
+		{
+			from: 0,
+			to: 0,
+			next: function (k) { return k * 1.2; }
+			//next: function (k) { return k + 0.01; }
+		},
+		{
+			from: 0,
+			to: 0,
+			next: function (k) { return k * 1.2; }
+		}
+	]
+};
 var timeout = 30 * 1000; // in ms
 var target = { x: 10, y: 0, z: 0 }; // Step
+var removeTimeouts = true;
 
 var pidType;
 function resetPidType() {
@@ -45,7 +67,7 @@ config.debug = false;
 config.controller.updater = 'stabilize-simple';
 
 function resetPidValue(i, type) {
-	config.controller.pid[type || pidType].x[i] = pidRanges[i].from;
+	config.controller.pid[type || pidType].x[i] = pidRanges[type || pidType][i].from;
 }
 function resetAllPidValues(type) {
 	[0, 1, 2].forEach(function (i) {
@@ -53,11 +75,11 @@ function resetAllPidValues(type) {
 	});
 }
 function nextPidValue(i) {
-	if (config.controller.pid[pidType].x[i] >= pidRanges[i].to) {
+	if (config.controller.pid[pidType].x[i] >= pidRanges[pidType][i].to) {
 		return false;
 	}
 
-	config.controller.pid[pidType].x[i] = pidRanges[i].next(config.controller.pid[pidType].x[i]);
+	config.controller.pid[pidType].x[i] = pidRanges[pidType][i].next(config.controller.pid[pidType].x[i]);
 	return true;
 }
 function nextAllPidValues() {
@@ -79,9 +101,9 @@ resetAllPidValues('rate');
 
 // Progress
 function getPidValueProgress(i, type) {
-	var dist = pidRanges[i].to - pidRanges[i].from;
+	var dist = pidRanges[type][i].to - pidRanges[type][i].from;
 	if (dist == 0) return 1;
-	return (config.controller.pid[type || pidType].x[i] - pidRanges[i].from) / dist;
+	return (config.controller.pid[type || pidType].x[i] - pidRanges[type][i].from) / dist;
 }
 function getProgress() {
 	var progress = 0;
@@ -139,13 +161,15 @@ quad.start().then(function () {
 
 			//console.log('Finished:', 'respTime='+respTime);
 
-			results.push({
-				pid: {
-					rate: extend(true, [], config.controller.pid.rate.x),
-					stabilize: extend(true, [], config.controller.pid.stabilize.x)
-				},
-				responseTime: respTime
-			});
+			if (!removeTimeouts || respTime < t) {
+				results.push({
+					pid: {
+						rate: extend(true, [], config.controller.pid.rate.x),
+						stabilize: extend(true, [], config.controller.pid.stabilize.x)
+					},
+					responseTime: respTime
+				});
+			}
 
 			quad.enabled = false;
 			model.reset();
