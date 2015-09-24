@@ -1,8 +1,8 @@
 'use strict';
 
-var Quadcopter = require('../lib/quadcopter');
+var QuadcopterBase = require('../lib/quadcopter-base');
 
-class MockQuadcopter extends Quadcopter {
+class MockQuadcopter extends QuadcopterBase {
 	constructor(config, model) {
 		super(config);
 
