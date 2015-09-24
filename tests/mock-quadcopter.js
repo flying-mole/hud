@@ -34,9 +34,15 @@ class MockQuadcopter extends QuadcopterBase {
 
 			that.emit('stabilize');
 
-			process.nextTick(function () {
-				that._stabilizeLoop();
-			});
+			if (that.enabled) {
+				process.nextTick(function () {
+					that._stabilizeLoop();
+				});
+			} else {
+				setTimeout(function () {
+					that._stabilizeLoop();
+				}, 200);
+			}
 		});
 	}
 }

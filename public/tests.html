@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>HUD tests</title>
+
+	<link rel="stylesheet" href="assets/components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/components/c3/c3.min.css">
+	<link rel="stylesheet" href="assets/main.css">
+
+	<script src="assets/components/jquery/dist/jquery.min.js"></script>
+	<script src="assets/serialize-object.jquery.js"></script>
+	<script src="assets/serialize-object.jquery.js"></script>
+	<script src="assets/components/d3/d3.min.js"></script>
+	<script src="assets/components/c3/c3.min.js"></script>
+	<script src="js/tests.js"></script>
+</head>
+<body>
+	<div class="container-fluid">
+		<form id="run-pid-form" class="form-horizontal">
+			<div class="row">
+				<div class="col-lg-6 col-xs-12">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Controller</label>
+						<div class="col-sm-10 form-inline">
+							<select name="updater" class="form-control">
+								<option>dummy</option>
+								<!-- <option>rate</option> -->
+								<option>rate-simple</option>
+								<option>stabilize-simple</option>
+								<option>physics</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Step</label>
+						<div class="col-sm-10 form-inline">
+							<input type="number" name="target" class="form-control" step="any" value="10"> °
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Timeout</label>
+						<div class="col-sm-10 form-inline">
+							<input type="number" name="timeout" class="form-control" step="any" value="30"> s
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label">PID values</label>
+						<div class="col-sm-10 form-inline">
+							<div>
+								Rate x: <input type="number" name="pid.rate.0" class="form-control" step="any">, <input type="number" name="pid.rate.1" class="form-control" step="any">, <input type="number" name="pid.rate.2" class="form-control" step="any">
+							</div>
+
+							<div>
+								Stabilize x: <input type="number" name="pid.stabilize.0" class="form-control" step="any">, <input type="number" name="pid.stabilize.1" class="form-control" step="any">, <input type="number" name="pid.stabilize.2" class="form-control" step="any">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="col-lg-6 col-xs-12">
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-10">
+							<button type="submit" class="btn btn-primary">Compute</button>
+							<button type="reset" class="btn btn-default">Reset</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div id="chart"></div>
+</body>
+</html>

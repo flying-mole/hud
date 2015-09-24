@@ -1,5 +1,6 @@
 var BSON = bson().BSON;
 window.BSON = BSON;
+
 var ws;
 
 var colors = require('./colors');
@@ -9,18 +10,6 @@ var getColorForPercentage = colors.getForPercentage,
 
 var Quadcopter = require('./quadcopter');
 var keyBindings = require('./key-bindings');
-
-$.fn.serializeObject = function () {
-	var arr = this.serializeArray();
-	var obj = {};
-
-	for (var i = 0; i < arr.length; i++) {
-		var item = arr[i];
-		obj[item.name] = item.value;
-	}
-
-	return obj;
-};
 
 function Joystick(el, oninput) {
 	var that = this;

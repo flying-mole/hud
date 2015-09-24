@@ -4,10 +4,14 @@ class Model {
 	constructor(config) {
 		this.config = config; // Quadcopter config
 
+		this.reset();
+	}
+
+	reset() {
 		this.t = 0; // Current time in ms
-		this.lastFrame = 0; // Time of the last Frame. 
+		this.lastFrame = 0; // Time of the last Frame
 		this.motorsForces = [0, 0, 0, 0]; // Motors forces in Newtons
-		
+
 		// Rotation, vitesse de rotation et accélération actuelle en rad/s.
 		// On considère les conditions initiales nulles.
 		this.rotation = 0;
@@ -71,11 +75,6 @@ class Model {
 			rotation: { x: rot / Math.PI * 180, y: 0 },
 			temp: 0
 		};
-	}
-
-	reset() {
-		this.t = 0;
-		this.lastFrame = 0;
 	}
 }
 

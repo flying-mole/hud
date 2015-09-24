@@ -1,14 +1,15 @@
 var fs = require('fs');
-var extend = require('extend');
 var MockQuadcopter = require('./mock-quadcopter');
 var Model = require('./model');
 var config = require('../config');
 
 var pids = {
-	rate: [0.02, 0, 0],
-	stabilize: [2, 0.1, 0]
+	/*rate: [0.02, 0, 0],
+	stabilize: [2, 0.1, 0]*/
+	rate: [0.012, 0.0001, 0],
+	stabilize: [7.088018749850909, 0.1144754599728827, 0]
 };
-var timeout = 15 * 1000; // in ms
+var timeout = 60 * 1000; // in ms
 var target = { x: 10, y: 0, z: 0 }; // Step
 
 // Set quad config

@@ -17,10 +17,10 @@
     "node": "^4.0"
   },
   "dependencies": {
-    "browserify-lite": "^0.4.0",
     "bson": "^0.3.1",
     "events": "^1.0.2",
     "express": "^4.12.3",
+    "express-browserify-lite": "^0.1.0",
     "express-ws": "^0.2.6",
     "extend": "^2.0.1",
     "i2c-bus": "^0.11.1",
