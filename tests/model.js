@@ -11,6 +11,7 @@ class Model {
 		this.t = 0; // Current time in ms
 		this.lastFrame = 0; // Time of the last Frame
 		this.motorsForces = [0, 0, 0, 0]; // Motors forces in Newtons
+		this.motorsSpeed = [0, 0, 0, 0]; // Motors speed, as sent to ESC
 
 		// Rotation, vitesse de rotation et accélération actuelle en rad/s.
 		// On considère les conditions initiales nulles.
