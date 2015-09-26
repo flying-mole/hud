@@ -266,10 +266,20 @@ function init(quad) {
 		var data = $(this).serializeObject();
 
 		sendCommand('orientation', {
-			x: data.x,
-			y: data.y,
-			z: data.z
+			x: parseFloat(data.x),
+			y: parseFloat(data.y),
+			z: parseFloat(data.z)
 		});
+
+		if (data.duration) {
+			setTimeout(function () {
+				sendCommand('orientation', {
+					x: 0,
+					y: 0,
+					z: 0
+				});
+			}, parseFloat(data.duration) * 1000);
+		}
 	});
 
 	var sineInterval, sineStartedAt;
