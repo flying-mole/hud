@@ -248,3 +248,23 @@ select {
 .motors-forces {
 	white-space: nowrap;
 }
+
+.c3-tooltip {
+	background-color: black;
+	box-shadow: none;
+	border-radius: 5px;
+}
+.c3-tooltip tr,
+.c3-tooltip th,
+.c3-tooltip td {
+	background-color: transparent;
+	border-color: transparent;
+	color: inherit;
+}
+
+@media print {
+	body {
+		background: white;
+		color: black;
+	}
+}
