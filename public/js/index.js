@@ -11,123 +11,11 @@ var getColorForPercentage = colors.getForPercentage,
 var Quadcopter = require('./quadcopter');
 var keyBindings = require('./key-bindings');
 
-function Joystick(el, oninput) {
-	var that = this;
+var MouseJoystick = require('./joystick/mouse');
+var DeviceOrientationJoystick = require('./joystick/device-orientation');
+var HardwareJoystick = require('./joystick/hardware');
 
-	this.joystick = $(el);
-	this.handle = this.joystick.find('.handle');
-
-	var joystickSize = {
-		width: this.joystick.width(),
-		height: this.joystick.height()
-	};
-	var handleSize = {
-		width: this.handle.width(),
-		height: this.handle.height()
-	};
-
-	this.pressed = true;
-
-	var offset;
-	this.joystick.on('mousedown mousemove mouseup', function (event) {
-		if ((event.type == 'mousemove' && event.buttons) || event.type == 'mousedown') {
-			if (!that.pressed) {
-				that.joystick.addClass('active');
-				that.pressed = true;
-
-				offset = that.joystick.offset();
-			}
-
-			var x = event.pageX - offset.left - handleSize.width/2,
-				y = event.pageY - offset.top - handleSize.height/2;
-
-			that.handle.css({
-				left: x,
-				top: y
-			});
-
-			// In degrees
-			oninput({
-				alpha: 0,
-				beta: (x - joystickSize.width/2) / joystickSize.width * 90, // front-to-back tilt in degrees, where front is positive
-				gamma: (y - joystickSize.height/2) / joystickSize.height * 90 // left-to-right tilt in degrees, where right is positive
-			});
-		} else {
-			if (that.pressed) {
-				that.joystick.removeClass('active');
-				that.handle.css({
-					left: joystickSize.width/2 - handleSize.width/2,
-					top: joystickSize.height/2 - handleSize.height/2
-				});
-				that.pressed = false;
-
-				oninput({
-					alpha: 0,
-					beta: 0,
-					gamma: 0
-				});
-			}
-		}
-	});
-	this.joystick.trigger('mouseup');
-}
-
-function DeviceOrientationJoystick(oninput) {
-	if (!DeviceOrientationJoystick.isSupported()) {
-		throw new Error('DeviceOrientation not supported');
-	}
-
-	window.addEventListener('deviceorientation', function (event) {
-		oninput({
-			alpha: event.alpha,
-			beta: event.beta, // front-to-back tilt in degrees, where front is positive
-			gamma: event.gamma // left-to-right tilt in degrees, where right is positive
-		});
-	}, false);
-}
-DeviceOrientationJoystick.isSupported = function () {
-	return (typeof window.DeviceOrientationEvent != 'undefined');
-};
-
-function HardwareJoystick(oninput) {
-	if (!HardwareJoystick.isSupported()) {
-		throw new Error('Gamepad API not supported');
-	}
-
-	var that = this;
-
-	window.addEventListener('gamepadconnected', function (e) {
-		console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
-			e.gamepad.index, e.gamepad.id,
-			e.gamepad.buttons.length, e.gamepad.axes.length);
-		log('Gamepad "'+e.gamepad.id+'" connected.');
-
-		that.gamepad = navigator.getGamepads()[e.gamepad.index];
-		that._loop(oninput);
-	});
-
-	window.addEventListener('gamepaddisconnected', function (e) {
-		log('Gamepad "'+e.gamepad.id+'" disconnected.');
-	});
-}
-HardwareJoystick.isSupported = function () {
-	return (!!navigator.getGamepads || !!navigator.webkitGetGamepads);
-};
-
-HardwareJoystick.prototype._loop = function (oninput) {
-	console.log(this.gamepad);
-
-	var gamepad = this.gamepad;
-
-	setInterval(function () { // TODO
-		oninput({
-			alpha: gamepad.axes[1],
-			beta: gamepad.axes[0], // front-to-back tilt in degrees, where front is positive
-			gamma: gamepad.axes[2] // left-to-right tilt in degrees, where right is positive
-		});
-		// gamepad.axes[3] is POWER
-	}, 500);
-};
+var graphsExport = require('./graphs-export');
 
 function QuadcopterSchema(svg) {
 	this.svg = $(svg);
@@ -317,87 +205,10 @@ $(function () {
 	motorsSpeed.addTimeSeries(graphs.motors_speed_3, yellowLine);
 });
 
-(function () {
-	var header, data;
-	var isRecording = false;
-	var graphsExport = {
-		start: function () {
-			isRecording = true;
-			this.reset();
-		},
-		stop: function () {
-			isRecording = false;
-		},
-		reset: function () {
-			header = ['timestamp'];
-			data = [];
-		},
-		isRecording: function () {
-			return isRecording;
-		},
-		append: function (name, timestamp, dataset) {
-			if (!isRecording) return;
-
-			var lastline = data[data.length - 1];
-
-			var line = new Array(header.length);
-			line[0] = timestamp;
-
-			var hasPushedNewData = false;
-			for (var key in dataset) {
-				var value = dataset[key];
-				var headerKey = name+'.'+key;
-				var i = header.indexOf(headerKey);
-				if (i >= 0) {
-					if (lastline && !hasPushedNewData && typeof lastline[i] != 'number') {
-						lastline[i] = value;
-					} else {
-						line[i] = value;
-						hasPushedNewData = true;
-					}
-				} else {
-					header.push(headerKey);
-					if (lastline) {
-						lastline.push(value);
-					} else {
-						line.push(value);
-						hasPushedNewData = true;
-					}
-				}
-			}
-
-			if (hasPushedNewData) {
-				data.push(line);
-			}
-		},
-		toCsv: function () {
-			if (!data || !header) return;
-
-			var csv = '';
-			csv += header.join(',');
-
-			for (var i = 0; i < data.length; i++) {
-				var line = data[i].join(',');
-				csv += '\n'+line;
-			}
-
-			return csv;
-		}
-	};
-
-	window.graphsExport = graphsExport;
-})();
-
 function init(quad) {
 	keyBindings(quad);
 
-	var joystick = new Joystick('#direction-input', function (data) {
-		sendCommand('orientation', {
-			x: data.beta,
-			y: data.gamma,
-			z: data.alpha
-		});
-	});
+	var joystick = new MouseJoystick('#direction-input', quad.cmd);
 
 	if (DeviceOrientationJoystick.isSupported()) {
 		var $switch = $('#orientation-switch');
@@ -429,7 +240,7 @@ function init(quad) {
 	});
 
 	$('#controller-btn').change(function () {
-		quad.config.pid.controller = $(this).val();
+		quad.config.controller.updater = $(this).val();
 		sendCommand('config', quad.config);
 	});
 
@@ -818,7 +629,7 @@ $(function () {
 		});
 
 		// PID controller config
-		$('#controller-btn').val(cfg.pid.controller);
+		$('#controller-btn').val(cfg.controller.updater);
 	});
 
 	quad.on('features', function (features) {
