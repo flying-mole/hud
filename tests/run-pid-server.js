@@ -60,8 +60,7 @@ app.ws('/socket', function (ws, req) {
 
 		// Set quad config
 		config.controller.updater = msg.updater;
-		config.controller.pid.stabilize.x = msg.pid.stabilize;
-		config.controller.pid.rate.x = msg.pid.rate;
+		config.updaters[msg.updater] = msg.pid;
 		quad.config = config;
 
 		quad.ctrl.setTarget({ x: msg.target, y: 0, z: 0 });

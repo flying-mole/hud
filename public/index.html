@@ -41,7 +41,6 @@
 					<label class="control-label" for="controller-btn">Controller:</label>
 					<select id="controller-btn" class="form-control">
 						<option>dummy</option>
-						<!-- <option>rate</option> -->
 						<option>rate-simple</option>
 						<option>stabilize-simple</option>
 						<option>physics</option>
@@ -475,7 +474,7 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label">PID interval</label>
 						<div class="col-sm-10 form-inline">
-							<input type="number" name="pid.interval" class="form-control" step="any" min="0"> ms
+							<input type="number" name="controller.interval" class="form-control" step="any" min="0"> ms
 						</div>
 					</div>
 
@@ -483,23 +482,11 @@
 						<label class="col-sm-2 control-label">PID values</label>
 						<div class="col-sm-10 form-inline">
 							<div>
-								Rate x: <input type="number" name="pid.values.rate.x.0" class="form-control" step="any">, <input type="number" name="pid.values.rate.x.1" class="form-control" step="any">, <input type="number" name="pid.values.rate.x.2" class="form-control" step="any">
-							</div>
-							<div>
-								Rate y: <input type="number" name="pid.values.rate.y.0" class="form-control" step="any">, <input type="number" name="pid.values.rate.y.1" class="form-control" step="any">, <input type="number" name="pid.values.rate.y.2" class="form-control" step="any">
-							</div>
-							<div>
-								Rate z: <input type="number" name="pid.values.rate.z.0" class="form-control" step="any">, <input type="number" name="pid.values.rate.z.1" class="form-control" step="any">, <input type="number" name="pid.values.rate.z.2" class="form-control" step="any">
+								Rate: <input type="number" name="updaters.stabilize-simple.rate.0" class="form-control" step="any">, <input type="number" name="updaters.stabilize-simple.rate.1" class="form-control" step="any">, <input type="number" name="updaters.stabilize-simple.rate.2" class="form-control" step="any">
 							</div>
 
 							<div>
-								Stabilize x: <input type="number" name="pid.values.stabilize.x.0" class="form-control" step="any">, <input type="number" name="pid.values.stabilize.x.1" class="form-control" step="any">, <input type="number" name="pid.values.stabilize.x.2" class="form-control" step="any">
-							</div>
-							<div>
-								Stabilize y: <input type="number" name="pid.values.stabilize.y.0" class="form-control" step="any">, <input type="number" name="pid.values.stabilize.y.1" class="form-control" step="any">, <input type="number" name="pid.values.stabilize.y.2" class="form-control" step="any">
-							</div>
-							<div>
-								Stabilize z: <input type="number" name="pid.values.stabilize.z.0" class="form-control" step="any">, <input type="number" name="pid.values.stabilize.z.1" class="form-control" step="any">, <input type="number" name="pid.values.stabilize.z.2" class="form-control" step="any">
+								Stabilize: <input type="number" name="updaters.stabilize-simple.stabilize.0" class="form-control" step="any">, <input type="number" name="updaters.stabilize-simple.stabilize.1" class="form-control" step="any">, <input type="number" name="updaters.stabilize-simple.stabilize.2" class="form-control" step="any">
 							</div>
 						</div>
 					</div>

@@ -15,8 +15,7 @@ var target = { x: 10, y: 0, z: 0 }; // Step
 // Set quad config
 config.debug = false;
 config.controller.updater = 'stabilize-simple';
-config.controller.pid.stabilize.x = pids.stabilize;
-config.controller.pid.rate.x = pids.rate;
+config.updaters['stabilize-simple'] = pids;
 
 var startTime = Date.now();
 

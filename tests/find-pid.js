@@ -47,6 +47,7 @@ var pidRanges = {
 var timeout = 30 * 1000; // in ms
 var target = { x: 10, y: 0, z: 0 }; // Step
 var removeTimeouts = true;
+var updater = 'stabilize-simple';
 
 var pidType;
 function resetPidType() {
@@ -64,10 +65,10 @@ resetPidType();
 
 // Set quad config
 config.debug = false;
-config.controller.updater = 'stabilize-simple';
+config.controller.updater = updater;
 
 function resetPidValue(i, type) {
-	config.controller.pid[type || pidType].x[i] = pidRanges[type || pidType][i].from;
+	config.updaters[updater][type || pidType][i] = pidRanges[type || pidType][i].from;
 }
 function resetAllPidValues(type) {
 	[0, 1, 2].forEach(function (i) {
@@ -75,11 +76,11 @@ function resetAllPidValues(type) {
 	});
 }
 function nextPidValue(i) {
-	if (config.controller.pid[pidType].x[i] >= pidRanges[pidType][i].to) {
+	if (config.updaters[updater][pidType][i] >= pidRanges[pidType][i].to) {
 		return false;
 	}
 
-	config.controller.pid[pidType].x[i] = pidRanges[pidType][i].next(config.controller.pid[pidType].x[i]);
+	config.updaters[updater][pidType][i] = pidRanges[pidType][i].next(config.updaters[updater][pidType][i]);
 	return true;
 }
 function nextAllPidValues() {
@@ -103,7 +104,7 @@ resetAllPidValues('rate');
 function getPidValueProgress(i, type) {
 	var dist = pidRanges[type][i].to - pidRanges[type][i].from;
 	if (dist == 0) return 1;
-	return (config.controller.pid[type || pidType].x[i] - pidRanges[type][i].from) / dist;
+	return (config.updaters[updater][type || pidType][i] - pidRanges[type][i].from) / dist;
 }
 function getProgress() {
 	var progress = 0;
@@ -162,10 +163,7 @@ quad.start().then(function () {
 
 			if (!removeTimeouts || respTime < t) {
 				results.push({
-					pid: {
-						rate: extend(true, [], config.controller.pid.rate.x),
-						stabilize: extend(true, [], config.controller.pid.stabilize.x)
-					},
+					pid: extend(true, {}, config.updaters[updater]),
 					responseTime: respTime
 				});
 			}
@@ -220,7 +218,7 @@ quad.start().then(function () {
 	});
 
 	function next() {
-		//console.log('Testing PID:', quad.config.controller.pid[pidType].x);
+		//console.log('Testing PID:', config.updaters[updater]);
 
 		// Start the quad
 		quad.ctrl.setTarget(target);

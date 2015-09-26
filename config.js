@@ -25,19 +25,20 @@ module.exports = {
 	},
 	"controller": {
 		"interval": 100,
-		"updater": "dummy",
-		"pid": { // cst for PIDs: [k_P, k_I, k_D]
-			"rate": {
-				"x": [0.001, 0, 0],
-				"y": [0, 0, 0],
-				"z": [0, 0, 0]
-			},
-			"stabilize": {
-				"x": [2, 0.1, 0],
-				"y": [0, 0, 0],
-				"z": [0, 0, 0]
-			}
-		}
+		"updater": "dummy"
+	},
+	"updaters": {
+		"dummy": {
+			"targetFactor": 0.2
+		},
+		"stabilize-simple": { // cst for PIDs: [k_P, k_I, k_D]
+			"rate": [0.001, 0, 0],
+			"stabilize": [2, 0.1, 0]
+		},
+		"rate-simple": {
+			"rate": [0.001, 0, 0]
+		},
+		"physics": {}
 	},
 	"server": {
 		"port": 3000 // HTTP server port
