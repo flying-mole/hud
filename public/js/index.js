@@ -249,15 +249,16 @@ function init(quad) {
 		sendCommand('config', quad.config);
 	});
 
-	$('#direction-type-btn').change(function () {
-		var selected = $(this).val();
-		
-		$(this).children('option').each(function (option) {
-			var inputType = $(this).text();
+	$('#direction-type-tabs').click(function (event) {
+		event.preventDefault();
 
-			$('#direction-'+inputType).toggle(inputType == selected);
+		$(this).find('a').each(function () {
+			var show = $(this).is(event.target);
+
+			$(this).parent().toggleClass('active', show);
+			$($(this).attr('href')).toggle(show);
 		});
-	}).change();
+	});
 
 	$('#direction-step').submit(function (event) {
 		event.preventDefault();
@@ -287,12 +288,34 @@ function init(quad) {
 			var t = ((new Date()).getTime() - sineStartedAt) / 1000;
 			var cmd = { x: 0, y: 0, z: 0 };
 			cmd[data.axis] = A * Math.sin(2 * Math.PI * f * t + phi);
-			console.log(cmd);
 			sendCommand('orientation', cmd);
 		}, 200);
 	});
 	$('#direction-sine-stop').click(function () {
 		clearInterval(sineInterval);
+	});
+
+	var rampInterval, rampStartedAt;
+	$('#direction-ramp').submit(function (event) {
+		event.preventDefault();
+
+		var data = $(this).serializeObject();
+
+		clearInterval(rampInterval);
+
+		rampStartedAt = (new Date()).getTime();
+		rampInterval = setInterval(function () {
+			var t = ((new Date()).getTime() - rampStartedAt) / 1000;
+			var cmd = { x: 0, y: 0, z: 0 };
+			cmd[data.axis] = data.slope * t;
+			if (cmd[data.axis] >= data.max) {
+				clearInterval(rampInterval);
+			}
+			sendCommand('orientation', cmd);
+		}, 200);
+	});
+	$('#direction-ramp-stop').click(function () {
+		clearInterval(rampInterval);
 	});
 
 	$('#calibrate-sensor-btn').click(function () {

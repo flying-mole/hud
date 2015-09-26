@@ -218,6 +218,27 @@ select {
 	border-radius: 3px;
 }
 
+.nav.nav-tabs {
+	border-bottom: none;
+}
+.nav-tabs > li > a, .nav-tabs > li > a:focus, .nav-tabs > li > a:hover,
+.nav-tabs.nav-justified > li > a, .nav-tabs.nav-justified > li > a:focus, .nav-tabs.nav-justified > li > a:hover,
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover,
+.nav-tabs.nav-justified > .active > a, .nav-tabs.nav-justified > .active > a:focus, .nav-tabs.nav-justified > .active > a:hover {
+	margin-right: 0;
+	border-radius: 0;
+	color: inherit;
+	background-color: transparent;
+	border: none;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.3);
+	outline: none;
+}
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover,
+.nav-tabs.nav-justified > .active > a, .nav-tabs.nav-justified > .active > a:focus, .nav-tabs.nav-justified > .active > a:hover {
+	/*color: rgba(0, 100, 200, 0.3);*/
+	border-color: rgba(0, 100, 200, 0.3);
+}
+
 .quadcopter-schema {
 	fill: rgb(58, 58, 58);
 	transition: 0.2s transform;

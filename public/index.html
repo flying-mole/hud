@@ -70,25 +70,24 @@
 				</div>
 			</div>
 			<div class="col-lg-3 col-xs-6 hidden-xs hidden-sm text-center">
-				<div class="form-inline">
-					<label class="control-label" for="direction-type-btn">Direction input type:</label>
-					<select id="direction-type-btn" class="form-control">
-						<option>custom</option>
-						<option>step</option>
-						<option>sine</option>
-					</select>
+				<div>
+					<strong>Direction</strong>
+
+					<ul class="nav nav-tabs nav-justified" id="direction-type-tabs">
+						<li class="active"><a href="#direction-custom">custom</a></li>
+						<li><a href="#direction-step">step</a></li>
+						<li><a href="#direction-sine">sine</a></li>
+						<li><a href="#direction-ramp">ramp</a></li>
+					</ul>
 				</div>
 
 				<div id="direction-custom">
-					<strong>Direction: custom</strong>
 					<div id="direction-input" class="joystick">
 						<div class="handle"></div>
 					</div>
 				</div>
-				
 
 				<form id="direction-step" class="form-inline">
-					<strong>Direction: step</strong>
 					<div>
 						x: <input type="number" name="x" value="0" step="any" class="form-control"> °
 					</div>
@@ -105,7 +104,6 @@
 				</form>
 
 				<form id="direction-sine" class="form-inline">
-					<strong>Direction: sine</strong>
 					<div>
 						Axis:
 						<select name="axis" class="form-control">
@@ -122,6 +120,30 @@
 					</div>
 					<div>
 						Offset: <input type="number" name="offset" value="0" step="any" class="form-control"> rad
+					</div>
+
+					<br>
+					<div class="btn-group" role="group">
+						<button type="submit" class="btn btn-primary">Start</button>
+						<button type="button" id="direction-sine-stop" class="btn btn-danger">Stop</button>
+					</div>
+					<button type="reset" class="btn btn-default">Reset</button>
+				</form>
+
+				<form id="direction-ramp" class="form-inline">
+					<div>
+						Axis:
+						<select name="axis" class="form-control">
+							<option>x</option>
+							<option>y</option>
+							<option>z</option>
+						</select>
+					</div>
+					<div>
+						Slope: <input type="number" name="slope" value="0" step="any" class="form-control"> °/s
+					</div>
+					<div>
+						Max: <input type="number" name="max" value="0" step="any" class="form-control"> °
 					</div>
 
 					<br>
