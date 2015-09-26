@@ -32,6 +32,8 @@ $(function () {
 			unload: true
 		});
 		//chartData.labels = output.t;
+		
+		$('#loading').hide();
 	};
 
 	$('#run-pid-form').submit(function (event) {
@@ -60,5 +62,9 @@ $(function () {
 		};
 
 		ws.send(JSON.stringify(msg));
+
+		$('#loading').show();
 	});
+
+	$('#loading').hide();
 });

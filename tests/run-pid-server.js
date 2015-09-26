@@ -58,6 +58,10 @@ app.ws('/socket', function (ws, req) {
 	ws.on('message', function (json) {
 		var msg = JSON.parse(json);
 
+		if (quad.enabled) {
+			return;
+		}
+
 		// Set quad config
 		config.controller.updater = msg.updater;
 		config.updaters[msg.updater] = msg.pid;
