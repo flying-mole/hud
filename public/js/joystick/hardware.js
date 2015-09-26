@@ -1,4 +1,4 @@
-function HardwareJoystick(oninput) {
+function HardwareJoystick(cmd) {
 	if (!HardwareJoystick.isSupported()) {
 		throw new Error('Gamepad API not supported');
 	}
@@ -12,7 +12,8 @@ function HardwareJoystick(oninput) {
 		log('Gamepad "'+e.gamepad.id+'" connected.');
 
 		that.gamepad = navigator.getGamepads()[e.gamepad.index];
-		that._loop(oninput);
+		that.calibrate();
+		that._loop(cmd);
 	});
 
 	window.addEventListener('gamepaddisconnected', function (e) {
@@ -24,19 +25,36 @@ HardwareJoystick.isSupported = function () {
 	return (!!navigator.getGamepads || !!navigator.webkitGetGamepads);
 };
 
-HardwareJoystick.prototype._loop = function (oninput) {
+HardwareJoystick.prototype._loop = function (cmd) {
 	console.log(this.gamepad);
 
-	var gamepad = this.gamepad;
+	var that = this;
 
-	setInterval(function () { // TODO
-		oninput({
-			alpha: gamepad.axes[1],
-			beta: gamepad.axes[0], // front-to-back tilt in degrees, where front is positive
-			gamma: gamepad.axes[2] // left-to-right tilt in degrees, where right is positive
+	var interval = setInterval(function () { // TODO
+		if (!that.gamepad.connected) {
+			clearInterval(interval);
+			return;
+		}
+
+		var cal = that.calibration;
+		var axes = that.gamepad.axes.map(function (value, i) {
+			if (cal && cal[i]) {
+				return value - cal[i];
+			}
+			return value;
 		});
-		// gamepad.axes[3] is POWER
+
+		cmd.send('orientation', {
+			x: axes[0] * 90,
+			y: axes[1] * 90,
+			z: axes[2] * 90
+		});
+		cmd.send('power', - axes[3]);
 	}, 500);
+};
+
+HardwareJoystick.prototype.calibrate = function () {
+	this.calibration = $.extend([], this.gamepad.axes);
 };
 
 module.exports = HardwareJoystick;

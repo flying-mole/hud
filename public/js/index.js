@@ -210,18 +210,19 @@ function init(quad) {
 
 	var joystick = new MouseJoystick('#direction-input', quad.cmd);
 
-	if (DeviceOrientationJoystick.isSupported()) {
-		var $switch = $('#orientation-switch');
-		var devOrientation = new DeviceOrientationJoystick(function (data) {
-			if ($switch.prop('checked')) {
-				sendCommand('orientation', data);
+	/*if (DeviceOrientationJoystick.isSupported()) {
+		var devOrientation = new DeviceOrientationJoystick(quad.cmd);
+
+		$('#orientation-switch').change(function () {
+			if ($(this).prop('checked')) {
+				devOrientation.start();
+			} else {
+				devOrientation.stop();
 			}
 		});
-	}
+	}*/
 	if (HardwareJoystick.isSupported()) {
-		var hwOrientation = new HardwareJoystick(function (data) {
-			sendCommand('orientation', data);
-		});
+		var hwOrientation = new HardwareJoystick(quad.cmd);
 	}
 
 	var lastPower;
@@ -233,6 +234,10 @@ function init(quad) {
 
 		lastPower = val;
 		sendCommand('power', val / 100);
+	});
+	quad.cmd.on('power', function (val) {
+		if (lastPower === val) return;
+		$('#power-input').val(Math.round(val * 100));
 	});
 
 	$('#power-switch').change(function () {
