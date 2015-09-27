@@ -22,8 +22,6 @@ $(function () {
 		var json = event.data,
 			output = JSON.parse(json);
 
-		console.log(output);
-
 		chart.load({
 			columns: [
 				['t'].concat(output.t),
@@ -31,11 +29,18 @@ $(function () {
 			],
 			unload: true
 		});
-		//chartData.labels = output.t;
-		
+
+		var fivePctUp = options.target + 0.05 * options.target,
+			fivePctDown = options.target - 0.05 * options.target;
+
+		chart.regions([
+			{ axis: 'y', start: fivePctDown, end: fivePctUp, class: 'five-pct' }
+		]);
+
 		$('#loading').hide();
 	};
 
+	var options;
 	$('#run-pid-form').submit(function (event) {
 		event.preventDefault();
 
@@ -51,7 +56,7 @@ $(function () {
 			return pid;
 		};
 
-		var msg = {
+		options = {
 			updater: data.updater,
 			target: parseFloat(data.target),
 			timeout: parseFloat(data.timeout) * 1000,
@@ -61,7 +66,7 @@ $(function () {
 			}
 		};
 
-		ws.send(JSON.stringify(msg));
+		ws.send(JSON.stringify(options));
 
 		$('#loading').show();
 	});

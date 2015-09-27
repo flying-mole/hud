@@ -11,6 +11,10 @@ module.exports = function () {
 	var quad = new MockQuadcopter(config, model);
 
 	return function run(options) {
+		if (!options.timeout) {
+			return Promise.reject('No timeout specified in options');
+		}
+
 		if (quad.enabled) {
 			return Promise.reject('Another test is already running');
 		}

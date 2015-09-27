@@ -1,7 +1,4 @@
-var BSON = bson().BSON;
-window.BSON = BSON;
-
-var ws;
+window.BSON = bson().BSON;
 
 var colors = require('./colors');
 var getColorForPercentage = colors.getForPercentage,
@@ -249,16 +246,7 @@ function init(quad) {
 		sendCommand('config', quad.config);
 	});
 
-	$('#direction-type-tabs').click(function (event) {
-		event.preventDefault();
-
-		$(this).find('a').each(function () {
-			var show = $(this).is(event.target);
-
-			$(this).parent().toggleClass('active', show);
-			$($(this).attr('href')).toggle(show);
-		});
-	});
+	$('#direction-type-tabs').tabs();
 
 	$('#direction-step').submit(function (event) {
 		event.preventDefault();
@@ -692,6 +680,10 @@ $(function () {
 		if (allGreen) {
 			log('ALL GREEN!', 'success');
 		}
+	});
+
+	quad.client.on('disconnect', function () {
+		log('Connection closed.');
 	});
 
 	// Inject SVGs into HTML to be able to style and animate them
