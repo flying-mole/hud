@@ -47,6 +47,11 @@ npm start
   * `sensors.js`: Inertial Mesurement Unit support
   * `server.js`: HTTP server
 * `public/`: browser code
+* `tests/`: code to run simulations
+  * `lib/`: library for tests
+  * `find-pid.js`: find the best PIDs (bruteforce them all)
+  * `run-model.js`: test the physical model
+  * `server.js`: HTTP server to test different PID values and draw responses graphs
 * `config.js`: persistent configuration
 
 ## What happens when...
