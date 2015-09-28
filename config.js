@@ -33,7 +33,7 @@ module.exports = {
 		},
 		"stabilize-simple": { // cst for PIDs: [k_P, k_I, k_D]
 			"rate": [0.001, 0, 0],
-			"stabilize": [2, 0.1, 0]
+			"stabilize": [2, 0.1, 0.1]
 		},
 		"rate-simple": {
 			"rate": [0.001, 0, 0]

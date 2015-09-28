@@ -28,6 +28,7 @@
     "i2c-mpu6050": "^2.2.0",
     "node-pid-controller": "emersion/node-pid-controller",
     "servoblaster": "^0.1.0",
-    "util": "^0.10.3"
+    "util": "^0.10.3",
+    "mpu6050-dmp": "emersion/mpu6050-dmp"
   }
 }
