@@ -259,7 +259,7 @@ function init(quad) {
 			z: parseFloat(data.z)
 		});
 
-		if (data.duration) {
+		if (parseFloat(data.duration)) {
 			setTimeout(function () {
 				sendCommand('orientation', {
 					x: 0,
