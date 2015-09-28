@@ -2,6 +2,11 @@
 
 var QuadcopterBase = require('../../lib/quadcopter-base');
 
+/**
+ * A mock quadcopter, for tests.
+ * It will not run for real - it needs a Model, which will fake the real quad's
+ * behaviour.
+ */
 class MockQuadcopter extends QuadcopterBase {
 	constructor(config, model) {
 		super(config);

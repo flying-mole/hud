@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * A physical model of the qudcopter's real behaviour.
+ */
 class Model {
 	constructor(config) {
 		this.config = config; // Quadcopter config

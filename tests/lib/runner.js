@@ -6,10 +6,23 @@ var config = require('../../config');
 
 config.debug = false;
 
+/**
+ * This function will return a test runner.
+ */
 module.exports = function () {
 	var model = new Model(config);
 	var quad = new MockQuadcopter(config, model);
 
+	/**
+	 * Run a test. Options:
+	 * * `timeout`: the test won't last forever: a timeout is needed to know when to give up
+	 * * `target`: the target angle
+	 * * `updater`: which updater to use to stabilize the quad
+	 * * `updaterConfig`: the updater's config
+	 * 
+	 * @param  {Object} options
+	 * @return {Promise}
+	 */
 	return function run(options) {
 		if (!options.timeout) {
 			return Promise.reject('No timeout specified in options');
@@ -21,7 +34,7 @@ module.exports = function () {
 
 		// Set quad config
 		config.controller.updater = options.updater;
-		config.updaters[options.updater] = options.pid;
+		config.updaters[options.updater] = options.pid || options.updaterConfig;
 		quad.config = config;
 
 		quad.ctrl.setTarget({ x: options.target, y: 0, z: 0 });
