@@ -1,18 +1,18 @@
 window.BSON = bson().BSON;
 
 var colors = require('./colors');
-var getColorForPercentage = colors.getForPercentage,
-	shadeColor = colors.shade,
-	colorToRgb = colors.toRgb;
-
-var Quadcopter = require('./quadcopter');
 var keyBindings = require('./key-bindings');
-
-var MouseJoystick = require('./joystick/mouse');
-var DeviceOrientationJoystick = require('./joystick/device-orientation');
-var HardwareJoystick = require('./joystick/hardware');
-
 var graphsExport = require('./graphs-export');
+var Quadcopter = require('./quadcopter');
+
+var input = {
+	Mouse: require('./input/mouse'),
+	DeviceOrientation: require('./input/device-orientation'),
+	Gamepad: require('./input/gamepad'),
+	Step: require('./input/step'),
+	Sine: require('./input/sine'),
+	Ramp: require('./input/ramp')
+};
 
 function QuadcopterSchema(svg) {
 	this.svg = $(svg);
@@ -22,8 +22,8 @@ QuadcopterSchema.prototype.setSpeed = function (speed) {
 
 	for (var i = 0; i < speed.length; i++) {
 		var s = speed[i];
-		var color = shadeColor(getColorForPercentage(1 - s), -0.5);
-		$(propellers[i]).css('fill', colorToRgb(color));
+		var color = colors.shade(colors.getForPercentage(1 - s), -0.5);
+		$(propellers[i]).css('fill', colors.toRgb(color));
 	}
 };
 QuadcopterSchema.prototype.setRotation = function (rot) {
@@ -205,10 +205,10 @@ $(function () {
 function init(quad) {
 	keyBindings(quad);
 
-	var joystick = new MouseJoystick('#direction-input', quad.cmd);
+	var mouseInput = new input.Mouse(quad.cmd, '#direction-input');
 
-	/*if (DeviceOrientationJoystick.isSupported()) {
-		var devOrientation = new DeviceOrientationJoystick(quad.cmd);
+	if (input.Gamepad.isSupported()) {
+		var devOrientation = new input.Gamepad(quad.cmd);
 
 		$('#orientation-switch').change(function () {
 			if ($(this).prop('checked')) {
@@ -217,9 +217,9 @@ function init(quad) {
 				devOrientation.stop();
 			}
 		});
-	}*/
-	if (HardwareJoystick.isSupported()) {
-		var hwOrientation = new HardwareJoystick(quad.cmd);
+	}
+	if (input.Gamepad.isSupported()) {
+		var gamepadInput = new input.Gamepad(quad.cmd);
 	}
 
 	var lastPower;
@@ -233,7 +233,7 @@ function init(quad) {
 		sendCommand('power', val / 100);
 	});
 	quad.cmd.on('power', function (val) {
-		if (lastPower === val) return;
+		if (lastPower / 100 === val) return;
 		$('#power-input').val(Math.round(val * 100));
 	});
 
@@ -248,72 +248,48 @@ function init(quad) {
 
 	$('#direction-type-tabs').tabs();
 
+	var stepInput = new input.Step(quad.cmd);
 	$('#direction-step').submit(function (event) {
 		event.preventDefault();
 
 		var data = $(this).serializeObject();
 
-		sendCommand('orientation', {
+		stepInput.start({
 			x: parseFloat(data.x),
 			y: parseFloat(data.y),
-			z: parseFloat(data.z)
+			z: parseFloat(data.z),
+			duration: parseFloat(data.duration) * 1000
 		});
-
-		if (parseFloat(data.duration)) {
-			setTimeout(function () {
-				sendCommand('orientation', {
-					x: 0,
-					y: 0,
-					z: 0
-				});
-			}, parseFloat(data.duration) * 1000);
-		}
 	});
 
-	var sineInterval, sineStartedAt;
+	var sineInput = new input.Sine(quad.cmd);
 	$('#direction-sine').submit(function (event) {
 		event.preventDefault();
 
 		var data = $(this).serializeObject();
-		var A = data.amplitude,
-			f = data.frequency,
-			phi = data.offset;
 
-		clearInterval(sineInterval);
-
-		sineStartedAt = (new Date()).getTime();
-		sineInterval = setInterval(function () {
-			var t = ((new Date()).getTime() - sineStartedAt) / 1000;
-			var cmd = { x: 0, y: 0, z: 0 };
-			cmd[data.axis] = A * Math.sin(2 * Math.PI * f * t + phi);
-			sendCommand('orientation', cmd);
-		}, 200);
+		sineInput.start({
+			amplitude: parseFloat(data.amplitude),
+			frequency: parseFloat(data.frequency),
+			offset: parseFloat(data.offset),
+			axis: data.axis
+		});
 	});
 	$('#direction-sine-stop').click(function () {
-		clearInterval(sineInterval);
+		sineInput.stop();
 	});
 
-	var rampInterval, rampStartedAt;
+	var rampInput = new input.Ramp(quad.cmd);
 	$('#direction-ramp').submit(function (event) {
 		event.preventDefault();
 
 		var data = $(this).serializeObject();
+		data.slope = parseFloat(data.slope);
 
-		clearInterval(rampInterval);
-
-		rampStartedAt = (new Date()).getTime();
-		rampInterval = setInterval(function () {
-			var t = ((new Date()).getTime() - rampStartedAt) / 1000;
-			var cmd = { x: 0, y: 0, z: 0 };
-			cmd[data.axis] = data.slope * t;
-			if (cmd[data.axis] >= data.max) {
-				clearInterval(rampInterval);
-			}
-			sendCommand('orientation', cmd);
-		}, 200);
+		rampInput.start(data);
 	});
 	$('#direction-ramp-stop').click(function () {
-		clearInterval(rampInterval);
+		rampInput.stop();
 	});
 
 	$('#calibrate-sensor-btn').click(function () {
@@ -538,14 +514,14 @@ $(function () {
 		for (var i = 0; i < stats.loadavg.length; i++) {
 			var avg = stats.loadavg[i];
 			var pct = Math.round(avg * 100);
-			loadavg.push('<span style="color: '+colorToRgb(shadeColor(getColorForPercentage(1 - avg), -0.5))+';">'+pct+'%</span>');
+			loadavg.push('<span style="color: '+colors.toRgb(colors.shade(colors.getForPercentage(1 - avg), -0.5))+';">'+pct+'%</span>');
 		}
 		$stats.find('.os-loadavg').html(loadavg.join(', '));
 
 		var memPct = stats.mem.free / stats.mem.total;
 		$stats.find('.os-mem')
 			.text(stats.mem.free + '/' + stats.mem.total + ' ('+Math.round(memPct * 100)+'%)')
-			.css('color', colorToRgb(shadeColor(getColorForPercentage(1 - memPct), -0.5)));
+			.css('color', colors.toRgb(colors.shade(colors.getForPercentage(1 - memPct), -0.5)));
 	});
 
 	// TODO: handle multiple config changes

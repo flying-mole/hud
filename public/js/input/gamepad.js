@@ -1,5 +1,5 @@
-function HardwareJoystick(cmd) {
-	if (!HardwareJoystick.isSupported()) {
+function GamepadInput(cmd) {
+	if (!GamepadInput.isSupported()) {
 		throw new Error('Gamepad API not supported');
 	}
 
@@ -21,11 +21,11 @@ function HardwareJoystick(cmd) {
 	});
 }
 
-HardwareJoystick.isSupported = function () {
+GamepadInput.isSupported = function () {
 	return (!!navigator.getGamepads || !!navigator.webkitGetGamepads);
 };
 
-HardwareJoystick.prototype._loop = function (cmd) {
+GamepadInput.prototype._loop = function (cmd) {
 	console.log(this.gamepad);
 
 	var that = this;
@@ -53,8 +53,8 @@ HardwareJoystick.prototype._loop = function (cmd) {
 	}, 500);
 };
 
-HardwareJoystick.prototype.calibrate = function () {
+GamepadInput.prototype.calibrate = function () {
 	this.calibration = $.extend([], this.gamepad.axes);
 };
 
-module.exports = HardwareJoystick;
+module.exports = GamepadInput;

@@ -1,4 +1,4 @@
-function MouseJoystick(el, cmd) {
+function MouseInput(cmd, el) {
 	var that = this;
 
 	this.joystick = $(el);
@@ -61,8 +61,8 @@ function MouseJoystick(el, cmd) {
 	});
 }
 
-MouseJoystick.isSupported = function () {
+MouseInput.isSupported = function () {
 	return true;
 };
 
-module.exports = MouseJoystick;
+module.exports = MouseInput;
