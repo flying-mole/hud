@@ -27,6 +27,7 @@ var graphsExport = {
 		var hasPushedNewData = false;
 		for (var key in dataset) {
 			var value = dataset[key];
+			if (typeof value == 'undefined') continue;
 			var headerKey = name+'.'+key;
 			var i = header.indexOf(headerKey);
 			if (i >= 0) {

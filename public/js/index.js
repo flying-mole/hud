@@ -461,7 +461,18 @@ $(function () {
 			graphs.motors_speed_3.append(timestamp, speeds[3]);
 		}
 
-		graphsExport.append('motors-speed', timestamp, speeds);
+		var exportedSpeeds = speeds.slice();
+		if (graphs.axes) {
+			if (graphs.axes.indexOf('x') == -1) {
+				exportedSpeeds[0] = undefined;
+				exportedSpeeds[2] = undefined;
+			}
+			if (graphs.axes.indexOf('y') == -1) {
+				exportedSpeeds[1] = undefined;
+				exportedSpeeds[3] = undefined;
+			}
+		}
+		graphsExport.append('motors-speed', timestamp, exportedSpeeds);
 	});
 
 	quad.on('motors-forces', function (forces) {
@@ -499,23 +510,25 @@ $(function () {
 		// Graphs
 		var timestamp = new Date().getTime();
 
-		function appendAxes(graphName, data) {
+		function appendAxes(name, data) {
 			var axes = graphs.axes || ['x', 'y', 'z'];
 
+			var exportedData = {};
 			for (var i = 0; i < axes.length; i++) {
 				var axis = axes[i];
 				if (typeof data[axis] == 'undefined') continue;
-				graphs[graphName+'_'+axis].append(timestamp, data[axis]);
+
+				var value = data[axis];
+				graphs[name+'_'+axis].append(timestamp, value);
+				exportedData[axis] = value;
 			}
+
+			graphsExport.append(name, timestamp, exportedData);
 		}
 
 		appendAxes('gyro', orientation.gyro);
 		appendAxes('accel', orientation.accel);
 		appendAxes('rotation', orientation.rotation);
-
-		for (var name in orientation) {
-			graphsExport.append(name, timestamp, orientation[name]);
-		}
 	});
 
 	quad.on('os-stats', function (stats) {
