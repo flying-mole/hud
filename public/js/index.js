@@ -200,6 +200,9 @@ function init(quad) {
 	cameraPreview.on('start', function () {
 		$('#camera-video').html(cameraPreview.player.canvas);
 	});
+	cameraPreview.on('error', function (err) {
+		log(err, 'error');
+	});
 	$('#camera-play-btn').click(function () {
 		cameraPreview.play();
 	});
@@ -208,6 +211,13 @@ function init(quad) {
 	});
 	$('#camera-stop-btn').click(function () {
 		cameraPreview.stop();
+	});
+	$('#camera-config-preview').submit(function () {
+		if (cameraPreview.isStarted()) {
+			setTimeout(function () {
+				cameraPreview.restart();
+			}, 500);
+		}
 	});
 
 	$('#camera-record-btn').click(function () {
@@ -505,32 +515,32 @@ $(function () {
 		});
 
 		// Camera config
-		var $camForm = $('#camera-config-form');
-		$camForm.find('input,select').each(function (i, input) {
-			handleInput(input, 'camera.preview');
-		});
-		$camForm.submit(function (event) {
-			event.preventDefault();
+		function initCameraConfigForm(form, type) {
+			var $form = $(form);
 
-			sendCommand('config', cfg);
+			$form.find('input,select').each(function (i, input) {
+				handleInput(input, 'camera.'+type);
+			});
+			$form.submit(function (event) {
+				event.preventDefault();
 
-			/*if (cameraPreview.isEnabled()) {
-				cameraPreview.restart();
-			}*/
-			// TODO
-		});
+				sendCommand('config', cfg);
+			});
 
-		$('#ISO-switch').change(function () {
-			if ($(this).prop('checked')) {
-				var val = parseInt($camForm.find('[name="ISO"]').val());
-				accessor('camera.preview.ISO', val);
-			} else {
-				accessor('camera.preview.ISO', null);
-			}
-		});
-		$camForm.find('[name="ISO"]').change(function () {
-			$('#ISO-switch').prop('checked', true);
-		});
+			$form.find('#ISO-switch').change(function () {
+				if ($(this).prop('checked')) {
+					var val = parseInt($form.find('[name="ISO"]').val());
+					accessor('camera.preview.ISO', val);
+				} else {
+					accessor('camera.preview.ISO', null);
+				}
+			});
+			$form.find('[name="ISO"]').change(function () {
+				$form.find('#ISO-switch').prop('checked', true);
+			});
+		}
+		initCameraConfigForm('#camera-config-preview', 'preview');
+		initCameraConfigForm('#camera-config-record', 'record');
 
 		// PID controller config
 		$('#controller-btn').val(cfg.controller.updater);
@@ -548,7 +558,7 @@ $(function () {
 			allGreen = false;
 		}
 		if (features.indexOf('camera') === -1) {
-			$('#camera').hide();
+			//$('#camera').hide();
 		}
 
 		var featuresStr = features.join(', ');
@@ -563,6 +573,10 @@ $(function () {
 	quad.client.on('disconnect', function () {
 		log('Connection closed.');
 	});
+
+	var cameraConfigHtml = $('#camera-config-inputs').html();
+	$('#camera-config-preview, #camera-config-record').html(cameraConfigHtml);
+	$('#camera-config-tabs').tabs();
 
 	// Inject SVGs into HTML to be able to style and animate them
 	var svgs = $('img[src$=".svg"]');

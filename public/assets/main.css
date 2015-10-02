@@ -28,6 +28,9 @@ pre {
 hr {
 	border-color: rgba(211, 211, 211, 0.1);
 }
+template {
+	display: none;
+}
 .btn, .btn:hover, .btn:active, .btn.active {
 	color: inherit;
 }
