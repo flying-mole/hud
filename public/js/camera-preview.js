@@ -52,7 +52,7 @@ CameraPreview.prototype._startWebsocket = function (done) {
 		that.stop();
 	});
 	ws.addEventListener('message', function (event) {
-		that.player.decode(event.data);
+		that.player.decode(new Uint8Array(event.data));
 	});
 
 	this._ws = ws;
