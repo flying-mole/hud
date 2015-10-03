@@ -34,6 +34,12 @@ CameraPreview.prototype._initPlayer = function () {
 	});
 
 	this.player = player;
+	
+	var splitter = new Worker('assets/nal-splitter.js');
+	splitter.addEventListener('message', function (event) {
+		player.decode(event.data);
+	});
+	this._splitter = splitter;
 };
 
 CameraPreview.prototype._startWebsocket = function (done) {
@@ -53,7 +59,7 @@ CameraPreview.prototype._startWebsocket = function (done) {
 	});
 	ws.addEventListener('message', function (event) {
 		var data = new Uint8Array(event.data);
-		that.player.decode(data);
+		that._splitter.postMessage(data);
 	});
 
 	this._ws = ws;
@@ -81,7 +87,9 @@ CameraPreview.prototype.stop = function () {
 	if (!this.isStarted()) return;
 
 	this._ws.close();
-	this.player.worker.terminate();
+	//this.player.worker.terminate();
+
+	this._cmd.send('camera-preview', false);
 };
 
 CameraPreview.prototype.restart = function () {
