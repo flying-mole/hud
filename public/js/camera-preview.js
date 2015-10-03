@@ -29,7 +29,7 @@ util.inherits(CameraPreview, EventEmitter);
 
 CameraPreview.prototype._initPlayer = function () {
 	var player = new Player({
-		useWorker: true,
+		useWorker: false,
 		workerFile: 'assets/broadway/Decoder.js'
 	});
 
@@ -52,7 +52,8 @@ CameraPreview.prototype._startWebsocket = function (done) {
 		that.stop();
 	});
 	ws.addEventListener('message', function (event) {
-		that.player.decode(new Uint8Array(event.data));
+		var data = new Uint8Array(event.data);
+		that.player.decode(data);
 	});
 
 	this._ws = ws;
@@ -67,21 +68,20 @@ CameraPreview.prototype.start = function () {
 
 	if (this.isStarted()) return;
 
-	this._cmd.send('camera-preview', true);
-
 	this._initPlayer();
 
 	this._startWebsocket(function () {
 		that.emit('start');
 	});
+
+	this._cmd.send('camera-preview', true);
 };
 
 CameraPreview.prototype.stop = function () {
 	if (!this.isStarted()) return;
 
 	this._ws.close();
-	this._decoder.terminate();
-	// TODO: this.player
+	this.player.worker.terminate();
 };
 
 CameraPreview.prototype.restart = function () {
