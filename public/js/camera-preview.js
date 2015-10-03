@@ -30,7 +30,8 @@ util.inherits(CameraPreview, EventEmitter);
 CameraPreview.prototype._initPlayer = function () {
 	var player = new Player({
 		useWorker: false,
-		workerFile: 'assets/broadway/Decoder.js'
+		workerFile: 'assets/broadway/Decoder.js',
+		transferMemory: true
 	});
 
 	this.player = player;
