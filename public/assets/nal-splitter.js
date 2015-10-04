@@ -17,7 +17,10 @@ var concatUint8 = function (buffers) {
 
 var buffers = [];
 self.addEventListener('message', function (event) {
-	var data = new Uint8Array(event.data);
+	var data = event.data;
+	if (!(data instanceof Uint8Array)) {
+		data = new Uint8Array(data);
+	}
 
 	var zerosCount = 0;
 	var lastOffset = 0;

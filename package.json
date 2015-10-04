@@ -26,9 +26,11 @@
     "extend": "^2.0.1",
     "i2c-bus": "^0.11.1",
     "i2c-mpu6050": "^2.2.0",
+    "mpu6050-dmp": "emersion/mpu6050-dmp",
     "node-pid-controller": "emersion/node-pid-controller",
     "servoblaster": "^0.1.0",
-    "util": "^0.10.3",
-    "mpu6050-dmp": "emersion/mpu6050-dmp"
+    "stream-split": "^0.2.0",
+    "through": "^2.3.8",
+    "util": "^0.10.3"
   }
 }

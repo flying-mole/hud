@@ -3,6 +3,7 @@ window.BSON = bson().BSON;
 var colors = require('./colors');
 var keyBindings = require('./key-bindings');
 var graphsExport = require('./graphs-export');
+var CameraPreview = require('./camera-preview');
 var Quadcopter = require('./quadcopter');
 
 var input = {
@@ -29,123 +30,6 @@ QuadcopterSchema.prototype.setSpeed = function (speed) {
 QuadcopterSchema.prototype.setRotation = function (rot) {
 	this.svg.css('transform', 'rotate('+rot+'deg)');
 };
-
-(function () {
-	/*var createStream = function (ondata) {
-		var xhr = new XMLHttpRequest();
-		xhr.open('GET', '/camera', true);
-		xhr.responseType = 'moz-chunked-arraybuffer'; // TODO: works only in Firefox
-		xhr.onprogress = function (event) {
-			ondata(xhr.response, event.loaded, event.total);
-		};
-		//xhr.onload = function () {
-		//	ondata(xhr.response);
-		//};
-		xhr.send(null);
-
-		return {
-			abort: function () {
-				xhr.abort();
-			}
-		};
-	};*/
-
-	var createStream = function (ondata) {
-		var ws = new WebSocket('ws://'+window.location.host+'/camera/socket');
-		ws.binaryType = 'arraybuffer';
-
-		ws.addEventListener('open', function () {
-			log('Camera connection opened.');
-		});
-
-		ws.addEventListener('error', function (event) {
-			console.error(error);
-			log('Camera connection error!', 'error');
-		});
-
-		ws.addEventListener('close', function () {
-			log('Camera connection closed.');
-		});
-
-		ws.addEventListener('message', function (event) {
-			ondata(event.data);
-		});
-
-		return {
-			play: function () {
-				ws.send('play');
-			},
-			pause: function () {
-				ws.send('pause');
-			},
-			abort: function () {
-				ws.close();
-			}
-		};
-	};
-
-	var stream, nalDecoder;
-	var cameraPreview = {
-		start: function () {
-			if (cameraPreview.isEnabled()) {
-				this.stop();
-			}
-
-			var player = new Player({
-				useWorker: true,
-				workerFile: 'assets/broadway/Decoder.js'
-			});
-
-			sendCommand('camera-preview', true);
-
-			nalDecoder = new Worker('assets/nal-decoder.js');
-			nalDecoder.addEventListener('message', function (event) {
-				player.decode(event.data);
-			}, false);
-
-			$('#camera-video').html(player.canvas);
-
-			log('Starting h264 decoder');
-
-			// TODO
-			setTimeout(function () {
-				stream = createStream(function (data, loaded) {
-					nalDecoder.postMessage(data);
-					//console.log(loaded, data.byteLength);
-				});
-			}, 1500);
-		},
-		stop: function () {
-			sendCommand('camera-preview', false);
-
-			if (stream) {
-				stream.abort();
-				stream = null;
-			}
-			if (nalDecoder) {
-				nalDecoder.terminate();
-				nalDecoder = null;
-			}
-		},
-		play: function () {
-			if (!stream) return this.start();
-			stream.play();
-		},
-		pause: function () {
-			if (!stream) return;
-			stream.pause();
-		},
-		restart: function () {
-			this.stop();
-			this.start();
-		},
-		isEnabled: function () {
-			return (stream) ? true : false;
-		}
-	};
-
-	window.cameraPreview = cameraPreview;
-})();
 
 (function () {
 	var graphs = {};
@@ -312,6 +196,13 @@ function init(quad) {
 		sendCommand('config', quad.config);
 	});
 
+	var cameraPreview = new CameraPreview(quad.cmd);
+	cameraPreview.on('start', function () {
+		$('#camera-video').html(cameraPreview.player.canvas);
+	});
+	cameraPreview.on('error', function (err) {
+		log(err, 'error');
+	});
 	$('#camera-play-btn').click(function () {
 		cameraPreview.play();
 	});
@@ -320,6 +211,13 @@ function init(quad) {
 	});
 	$('#camera-stop-btn').click(function () {
 		cameraPreview.stop();
+	});
+	$('#camera-config-preview').submit(function () {
+		if (cameraPreview.isStarted()) {
+			setTimeout(function () {
+				cameraPreview.restart();
+			}, 500);
+		}
 	});
 
 	$('#camera-record-btn').click(function () {
@@ -617,31 +515,32 @@ $(function () {
 		});
 
 		// Camera config
-		var $camForm = $('#camera-config-form');
-		$camForm.find('input,select').each(function (i, input) {
-			handleInput(input, 'camera.preview');
-		});
-		$camForm.submit(function (event) {
-			event.preventDefault();
+		function initCameraConfigForm(form, type) {
+			var $form = $(form);
 
-			sendCommand('config', cfg);
+			$form.find('input,select').each(function (i, input) {
+				handleInput(input, 'camera.'+type);
+			});
+			$form.submit(function (event) {
+				event.preventDefault();
 
-			if (cameraPreview.isEnabled()) {
-				cameraPreview.restart();
-			}
-		});
+				sendCommand('config', cfg);
+			});
 
-		$('#ISO-switch').change(function () {
-			if ($(this).prop('checked')) {
-				var val = parseInt($camForm.find('[name="ISO"]').val());
-				accessor('camera.preview.ISO', val);
-			} else {
-				accessor('camera.preview.ISO', null);
-			}
-		});
-		$camForm.find('[name="ISO"]').change(function () {
-			$('#ISO-switch').prop('checked', true);
-		});
+			$form.find('#ISO-switch').change(function () {
+				if ($(this).prop('checked')) {
+					var val = parseInt($form.find('[name="ISO"]').val());
+					accessor('camera.preview.ISO', val);
+				} else {
+					accessor('camera.preview.ISO', null);
+				}
+			});
+			$form.find('[name="ISO"]').change(function () {
+				$form.find('#ISO-switch').prop('checked', true);
+			});
+		}
+		initCameraConfigForm('#camera-config-preview', 'preview');
+		initCameraConfigForm('#camera-config-record', 'record');
 
 		// PID controller config
 		$('#controller-btn').val(cfg.controller.updater);
@@ -659,7 +558,7 @@ $(function () {
 			allGreen = false;
 		}
 		if (features.indexOf('camera') === -1) {
-			$('#camera').hide();
+			//$('#camera').hide();
 		}
 
 		var featuresStr = features.join(', ');
@@ -674,6 +573,10 @@ $(function () {
 	quad.client.on('disconnect', function () {
 		log('Connection closed.');
 	});
+
+	var cameraConfigHtml = $('#camera-config-inputs').html();
+	$('#camera-config-preview, #camera-config-record').html(cameraConfigHtml);
+	$('#camera-config-tabs').tabs();
 
 	// Inject SVGs into HTML to be able to style and animate them
 	var svgs = $('img[src$=".svg"]');
