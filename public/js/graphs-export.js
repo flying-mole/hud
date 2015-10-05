@@ -4,7 +4,7 @@ var isRecording = false;
 var graphsExport = {
 	start: function () {
 		isRecording = true;
-		this._startTime = (new Date).getTime();
+		this._startTime = new Date().getTime();
 		this.reset();
 	},
 	stop: function () {

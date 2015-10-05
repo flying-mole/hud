@@ -178,7 +178,7 @@ function init(quad) {
 
 	$('#calibrate-sensor-btn').click(function () {
 		var calibration = $.extend(true, {}, quad.config.mpu6050.calibration);
-		var types = ['gyro', 'accel'];
+		var types = ['gyro', 'accel', 'rotation'];
 		for (var i = 0; i < types.length; i++) {
 			var type = types[i];
 			if (!calibration[type]) {
@@ -292,6 +292,25 @@ $(function () {
 	quad.on('power', function (power) {
 		$('#power-input').val(Math.round(power * 100));
 	});
+
+	// Add target to graphs export
+	(function () {
+		var target;
+		quad.cmd.on('orientation', function (t) {
+			target = t;
+		});
+		quad.on('motors-speed', function () {
+			var timestamp = new Date().getTime();
+			if (graphs.axes) {
+				for (var axis in target) {
+					if (graphs.axes.indexOf(axis) == -1) {
+						delete target[axis];
+					}
+				}
+			}
+			graphsExport.append('target', timestamp, target)
+		});
+	})();
 
 	quad.on('motors-speed', function (speeds) {
 		if (quad.config) {
