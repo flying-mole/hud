@@ -577,7 +577,7 @@ $(function () {
 			allGreen = false;
 		}
 		if (features.indexOf('camera') === -1) {
-			//$('#camera').hide();
+			$('#camera').hide();
 		}
 
 		var featuresStr = features.join(', ');
