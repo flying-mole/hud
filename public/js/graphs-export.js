@@ -4,6 +4,7 @@ var isRecording = false;
 var graphsExport = {
 	start: function () {
 		isRecording = true;
+		this._startTime = (new Date).getTime();
 		this.reset();
 	},
 	stop: function () {
@@ -22,7 +23,7 @@ var graphsExport = {
 		var lastline = data[data.length - 1];
 
 		var line = new Array(header.length);
-		line[0] = timestamp;
+		line[0] = (timestamp - this._startTime)/1000;
 
 		var hasPushedNewData = false;
 		for (var key in dataset) {
