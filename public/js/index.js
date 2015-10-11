@@ -568,25 +568,30 @@ $(function () {
 	quad.on('features', function (features) {
 		var allGreen = true;
 
-		if (features.indexOf('motors') === -1) {
+		if (features.hardware.indexOf('motors') === -1) {
 			log('Motors not available', 'error');
 			allGreen = false;
 		}
-		if (features.indexOf('imu') === -1) {
+		if (features.hardware.indexOf('imu') === -1) {
 			log('Inertial Measurement Unit not available', 'error');
 			allGreen = false;
 		}
-		if (features.indexOf('camera') === -1) {
+		if (features.hardware.indexOf('camera') === -1) {
 			$('#camera').hide();
 		}
 
-		var featuresStr = features.join(', ');
+		var featuresStr = features.hardware.join(', ');
 		if (!featuresStr) featuresStr = '(none)';
 		log('Available features: '+featuresStr);
 
 		if (allGreen) {
 			log('ALL GREEN!', 'success');
 		}
+
+		// Update updaters list
+		$('#controller-btn').html(features.updaters.map(function (name) {
+			return '<option>'+name+'</option>';
+		}));
 	});
 
 	quad.client.on('disconnect', function () {
