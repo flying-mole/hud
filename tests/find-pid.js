@@ -44,8 +44,8 @@ var pidRanges = {
 		}
 	]
 };
-var timeout = 30 * 1000; // in ms
-var target = 10; // Step
+var timeout = 10 * 1000; // in ms
+var target = 21; // Step
 var removeTimeouts = true;
 var updater = 'stabilize-simple';
 

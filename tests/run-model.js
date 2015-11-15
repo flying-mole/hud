@@ -1,13 +1,13 @@
-'use strict';
-
-var Model = require('./model');
+var Model = require('./lib/model');
 var config = require('../config');
 
 var tMax = 2 * 1000; // 2 seconds
 var tInterval = 100; // 100ms
 
 var model = new Model(config);
-model.motorsForces = [1.1, 1, 0.9, 1]; // In Newtons
+
+var df = 0.86;
+model.motorsForces = [0.85, 1, 0.85 + df, 1]; // In Newtons
 
 for (var t = 0; t <= tMax; t += tInterval) {
 	model.t = t;
