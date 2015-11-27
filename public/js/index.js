@@ -272,6 +272,16 @@ $(function () {
 	}
 	window.log = log;
 
+	var $alerts = $('#alert-ctn');
+	function addAlert(msg, type) {
+		var $alert = $('<div></div>', { 'class': 'alert alert-'+type }).html(msg);
+		$alerts.append($alert);
+		return $alert;
+	}
+	function removeAlert($alert) {
+		$alert.remove();
+	}
+
 	// TODO: this is deprecated, use Quadcopter methods instead
 	window.sendCommand = function (cmd, opts) {
 		quad.cmd.send(cmd, opts);
@@ -596,11 +606,14 @@ $(function () {
 
 	quad.client.on('disconnect', function () {
 		log('Connection closed.');
+		addAlert('Connection to server lost.', 'danger');
 	});
 
 	var cameraConfigHtml = $('#camera-config-inputs').html();
 	$('#camera-config-preview, #camera-config-record').html(cameraConfigHtml);
 	$('#camera-config-tabs').tabs();
+
+	var connectingAlert = addAlert('Connecting to server...', 'info');
 
 	// Inject SVGs into HTML to be able to style and animate them
 	var svgs = $('img[src$=".svg"]');
@@ -617,6 +630,7 @@ $(function () {
 			init(quad);
 
 			log('Connected!');
+			removeAlert(connectingAlert);
 		});
 	});
 });

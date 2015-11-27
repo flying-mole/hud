@@ -286,6 +286,31 @@ select {
 	color: inherit;
 }
 
+#alert-ctn {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 10px;
+	pointer-events: none;
+}
+#alert-ctn .alert {
+	color: white;
+	border: none;
+	margin-bottom: 0;
+	margin-top: 20px;
+}
+#alert-ctn .alert-success {
+	background: #2B8000;
+}
+#alert-ctn .alert-info {
+	background: #0064C8;
+}
+#alert-ctn .alert-danger {
+	background: #B40000;
+}
+
 @media print {
 	body {
 		background: white;
