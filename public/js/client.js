@@ -1,5 +1,6 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+var msgpack = msgpack5(); // TODO: load dependency via browserify
 
 function Client() {
 	EventEmitter.call(this);
@@ -33,7 +34,7 @@ Client.prototype.connect = function (cb) {
 	});
 
 	ws.addEventListener('message', function (event) {
-		var msg = BSON.deserialize(new Uint8Array(event.data));
+		var msg = msgpack.decode(new Uint8Array(event.data));
 		that.emit('message', msg);
 	});
 
@@ -49,7 +50,7 @@ Client.prototype.disconnect = function () {
 };
 
 Client.prototype.send = function (cmd, opts) {
-	this.socket.send(BSON.serialize({
+	this.socket.send(msgpack.encode({
 		cmd: cmd,
 		opts: opts
 	}));

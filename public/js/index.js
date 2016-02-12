@@ -1,5 +1,3 @@
-window.BSON = bson().BSON;
-
 var colors = require('./colors');
 var keyBindings = require('./key-bindings');
 var graphsExport = require('./graphs-export');
