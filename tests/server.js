@@ -1,5 +1,6 @@
 var express = require('express');
 var expressWs = require('express-ws');
+var browserify = require('express-browserify-lite');
 var runTest = require('./lib/runner')();
 
 var app = express();
@@ -20,7 +21,15 @@ app.ws('/socket', function (ws, req) {
 });
 
 var publicDir = __dirname+'/../public';
+
+// DEV ONLY
+// Send client library, and bundle its dependencies
+app.get('/assets/tests.js', browserify({
+	entrySourcePath: publicDir+'/js/tests.js'
+}));
+
 app.use(express.static(publicDir, { index: 'tests.html' }));
+app.use('/node_modules', express.static(__dirname+'/../node_modules'));
 
 var server = app.listen(process.env.PORT || 3001, function () {
 	console.log('Server listening on port ' + server.address().port);

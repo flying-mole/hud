@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 function MouseInput(cmd, el) {
 	var that = this;
 

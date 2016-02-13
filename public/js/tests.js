@@ -1,3 +1,8 @@
+var $ = require('jquery');
+var c3 = require('c3');
+
+require('./jquery/serialize-object')($);
+
 $(function () {
 	var chart = c3.generate({
 		bindto: '#chart',

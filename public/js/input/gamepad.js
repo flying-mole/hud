@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 function GamepadInput(cmd) {
 	if (!GamepadInput.isSupported()) {
 		throw new Error('Gamepad API not supported');

@@ -1,3 +1,4 @@
+var $ = require('jquery');
 var colors = require('./colors');
 
 function QuadcopterSchema(svg) {

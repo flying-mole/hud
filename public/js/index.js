@@ -1,9 +1,15 @@
+var $ = require('jquery');
+var SVGInjector = require('svg-injector');
+var smoothie = require('smoothie');
 var colors = require('./colors');
 var keyBindings = require('./key-bindings');
 var graphsExport = require('./graphs-export');
 var CameraPreview = require('./camera-preview');
 var QuadcopterSchema = require('./quad-schema');
 var Quadcopter = require('./quadcopter');
+
+require('./jquery/serialize-object')($);
+require('./jquery/tabs')($);
 
 var input = {
 	Mouse: require('./input/mouse'),
@@ -25,7 +31,7 @@ var input = {
 	];
 	for (var i = 0; i < graphNames.length; i++) {
 		var name = graphNames[i];
-		graphs[name] = new TimeSeries();
+		graphs[name] = new smoothie.TimeSeries();
 	}
 
 	window.graphs = graphs;
@@ -43,25 +49,25 @@ $(function () {
 	var blueLine = { strokeStyle: 'rgb(0, 0, 255)' };
 	var yellowLine = { strokeStyle: 'yellow' };
 
-	var gyro = new SmoothieChart(chartStyle);
+	var gyro = new smoothie.SmoothieChart(chartStyle);
 	gyro.streamTo(document.getElementById('sensor-gyro-graph'));
 	gyro.addTimeSeries(graphs.gyro_x, redLine);
 	gyro.addTimeSeries(graphs.gyro_y, greenLine);
 	gyro.addTimeSeries(graphs.gyro_z, blueLine);
 
-	var accel = new SmoothieChart(chartStyle);
+	var accel = new smoothie.SmoothieChart(chartStyle);
 	accel.streamTo(document.getElementById('sensor-accel-graph'));
 	accel.addTimeSeries(graphs.accel_x, redLine);
 	accel.addTimeSeries(graphs.accel_y, greenLine);
 	accel.addTimeSeries(graphs.accel_z, blueLine);
 
-	var rotation = new SmoothieChart(chartStyle);
+	var rotation = new smoothie.SmoothieChart(chartStyle);
 	rotation.streamTo(document.getElementById('sensor-rotation-graph'));
 	rotation.addTimeSeries(graphs.rotation_x, redLine);
 	rotation.addTimeSeries(graphs.rotation_y, greenLine);
 	rotation.addTimeSeries(graphs.rotation_z, blueLine);
 
-	var motorsSpeed = new SmoothieChart(chartStyle);
+	var motorsSpeed = new smoothie.SmoothieChart(chartStyle);
 	motorsSpeed.streamTo(document.getElementById('motors-speed-graph'));
 	motorsSpeed.addTimeSeries(graphs.motors_speed_0, redLine);
 	motorsSpeed.addTimeSeries(graphs.motors_speed_1, greenLine);
