@@ -19,10 +19,11 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "broadway-player": "^0.1.1",
     "c3": "^0.4.11-rc4",
     "events": "^1.0.2",
     "express": "^4.12.3",
-    "express-browserify-lite": "^0.1.0",
+    "express-browserify-lite": "^0.1.2",
     "express-ws": "^0.2.6",
     "extend": "^2.0.1",
     "i2c-bus": "^0.11.1",

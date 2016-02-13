@@ -30,12 +30,12 @@ util.inherits(CameraPreview, EventEmitter);
 CameraPreview.prototype._initPlayer = function () {
 	var player = new Player({
 		useWorker: false,
-		workerFile: 'assets/broadway/Decoder.js',
+		workerFile: 'node_modules/broadway-player/Player/Decoder.js',
 		transferMemory: true
 	});
 
 	this.player = player;
-	
+
 	var splitter = new Worker('assets/nal-splitter.js');
 	splitter.addEventListener('message', function (event) {
 		player.decode(event.data);
