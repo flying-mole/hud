@@ -1,5 +1,78 @@
-var $ = require('jquery');
-var SVGInjector = require('svg-injector');
+'use strict';
+
+var document = require('global/document');
+var hg = require('mercury');
+var h = require('mercury').h;
+var Quadcopter = require('./quadcopter');
+var PowerBtn = require('./widget/power-btn');
+var ControllerBtn = require('./widget/controller-btn');
+
+function App() {
+	var quad = new Quadcopter();
+
+	var state = hg.state({
+		console: hg.array([]),
+		quad: quad,
+		powerBtn: PowerBtn(quad),
+		controllerBtn: ControllerBtn(quad),
+		channels: {
+			log: log
+		}
+	});
+
+	log(state, 'Connecting to server...');
+
+	state.quad.init(function (err) {
+		if (err) {
+			return log(state, { type: 'error', msg: err });
+		}
+		log(state, 'Connected!');
+	});
+
+	state.quad.on('error', function (msg) {
+		log(state, { type: 'error', msg: msg });
+	});
+	state.quad.on('info', function (msg) {
+		log(state, { type: 'info', msg: msg });
+	});
+
+	return state;
+}
+
+function log(state, data) {
+	if (typeof data === 'string') {
+		data = { msg: data };
+	}
+
+	state.console.push({
+		type: data.type,
+		msg: data.msg
+	});
+}
+
+App.render = function (state) {
+	return h('div#app', [
+		h('div#console.container-fluid', [
+			h('pre', state.console.map(renderLog))
+		]),
+		h('hr'),
+		h('div.container-fluid', h('div.row', [
+			h('div.col-lg-6.col-xs-12', [
+				hg.partial(PowerBtn.render, state.powerBtn),
+				hg.partial(ControllerBtn.render, state.controllerBtn)
+			]),
+			h('div.col-lg-6.col-xs-12', [])
+		]))
+	]);
+};
+
+function renderLog(item) {
+	return h('span.' + (item.type || 'log'), item.msg + '\n');
+}
+
+hg.app(document.body, App(), App.render);
+
+/*var SVGInjector = require('svg-injector');
 var smoothie = require('smoothie');
 var colors = require('./colors');
 var keyBindings = require('./key-bindings');
@@ -623,3 +696,4 @@ $(function () {
 		});
 	});
 });
+*/
