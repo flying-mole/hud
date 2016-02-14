@@ -32,8 +32,6 @@ StreamingChart.prototype.init = function () {
   return canvas;
 };
 
-StreamingChart.prototype.update = function (prev, elem) {
-
-};
+StreamingChart.prototype.update = function (prev, elem) {};
 
 module.exports = StreamingChart;
