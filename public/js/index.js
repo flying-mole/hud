@@ -4,6 +4,7 @@ var document = require('global/document');
 var hg = require('mercury');
 var h = require('mercury').h;
 var Quadcopter = require('./quadcopter');
+var Console = require('./widget/console');
 var PowerBtn = require('./widget/power-btn');
 var ControllerBtn = require('./widget/controller-btn');
 var SystemSummary = require('./widget/system-summary');
@@ -15,8 +16,7 @@ function App() {
 	var quad = new Quadcopter();
 
 	var state = hg.state({
-		console: hg.array([]),
-		quad: quad,
+		console: Console(quad),
 		powerBtn: PowerBtn(quad),
 		controllerBtn: ControllerBtn(quad),
 		systemSummary: SystemSummary(quad),
@@ -24,49 +24,17 @@ function App() {
 		direction: hg.struct({
 			mouse: MouseDirection()
 		}),
-		charts: Charts(quad),
-		channels: {
-			log: log
-		}
+		charts: Charts(quad)
 	});
 
-	log(state, 'Connecting to server...');
-
-	state.quad.init(function (err) {
-		if (err) {
-			return log(state, { type: 'error', msg: err });
-		}
-		log(state, 'Connected!');
-	});
-
-	state.quad.on('error', function (msg) {
-		log(state, { type: 'error', msg: msg });
-	});
-	state.quad.on('info', function (msg) {
-		log(state, { type: 'info', msg: msg });
-	});
+	quad.init();
 
 	return state;
 }
 
-function log(state, data) {
-	if (typeof data === 'string') {
-		data = { msg: data };
-	}
-
-	state.console.push({
-		type: data.type,
-		msg: data.msg
-	});
-}
-
 App.render = function (state) {
 	return h('#app', [
-		h('#console.container-fluid', [
-			h('pre', state.console.map(function (item) {
-				return h('span.' + (item.type || 'log'), item.msg + '\n');
-			}))
-		]),
+		hg.partial(Console.render, state.console),
 		h('hr'),
 		h('.container-fluid', h('.row', [
 			h('.col-lg-6.col-xs-12', [
@@ -292,16 +260,6 @@ $(function () {
 
 	var quad = new Quadcopter();
 
-	// Console
-	var $console = $('#console pre');
-	function log(msg, type) {
-		if (type) {
-			msg = '<span class="'+type+'">'+msg+'</span>';
-		}
-		$console.append(msg, '\n');
-	}
-	window.log = log;
-
 	var $alerts = $('#alert-ctn');
 	function addAlert(msg, type) {
 		var $alert = $('<div></div>', { 'class': 'alert alert-'+type }).html(msg);
@@ -311,23 +269,6 @@ $(function () {
 	function removeAlert($alert) {
 		$alert.remove();
 	}
-
-	// TODO: this is deprecated, use Quadcopter methods instead
-	window.sendCommand = function (cmd, opts) {
-		quad.cmd.send(cmd, opts);
-	};
-
-	quad.on('error', function (msg) {
-		log(msg, 'error');
-	});
-
-	quad.on('info', function (msg) {
-		log(msg, 'info');
-	});
-
-	quad.on('enabled', function (enabled) {
-		$('#power-switch').prop('checked', enabled);
-	});
 
 	quad.on('power', function (power) {
 		$('#power-input').val(Math.round(power * 100));
@@ -383,16 +324,6 @@ $(function () {
 			});
 		}
 		$('#motors-stats .motors-speed').html(speedsList.join('<br>'));
-
-		var timestamp = new Date().getTime();
-		if (!graphs.axes || graphs.axes.indexOf('x') >= 0) {
-			graphs.motors_speed_0.append(timestamp, speeds[0]);
-			graphs.motors_speed_2.append(timestamp, speeds[2]);
-		}
-		if (!graphs.axes || graphs.axes.indexOf('y') >= 0) {
-			graphs.motors_speed_1.append(timestamp, speeds[1]);
-			graphs.motors_speed_3.append(timestamp, speeds[3]);
-		}
 
 		var exportedSpeeds = speeds.slice();
 		if (graphs.axes) {
@@ -452,7 +383,6 @@ $(function () {
 				if (typeof data[axis] == 'undefined') continue;
 
 				var value = data[axis];
-				graphs[name+'_'+axis].append(timestamp, value);
 				exportedData[axis] = value;
 			}
 
@@ -462,23 +392,6 @@ $(function () {
 		appendAxes('gyro', orientation.gyro);
 		appendAxes('accel', orientation.accel);
 		appendAxes('rotation', orientation.rotation);
-	});
-
-	quad.on('os-stats', function (stats) {
-		var $stats = $('#os-stats');
-
-		var loadavg = [];
-		for (var i = 0; i < stats.loadavg.length; i++) {
-			var avg = stats.loadavg[i];
-			var pct = Math.round(avg * 100);
-			loadavg.push('<span style="color: '+colors.toRgb(colors.shade(colors.getForPercentage(1 - avg), -0.5))+';">'+pct+'%</span>');
-		}
-		$stats.find('.os-loadavg').html(loadavg.join(', '));
-
-		var memPct = stats.mem.free / stats.mem.total;
-		$stats.find('.os-mem')
-			.text(stats.mem.free + '/' + stats.mem.total + ' ('+Math.round(memPct * 100)+'%)')
-			.css('color', colors.toRgb(colors.shade(colors.getForPercentage(1 - memPct), -0.5)));
 	});
 
 	// TODO: handle multiple config changes
@@ -606,36 +519,12 @@ $(function () {
 	});
 
 	quad.on('features', function (features) {
-		var allGreen = true;
-
-		if (features.hardware.indexOf('motors') === -1) {
-			log('Motors not available', 'error');
-			allGreen = false;
-		}
-		if (features.hardware.indexOf('imu') === -1) {
-			log('Inertial Measurement Unit not available', 'error');
-			allGreen = false;
-		}
 		if (features.hardware.indexOf('camera') === -1) {
 			$('#camera').hide();
 		}
-
-		var featuresStr = features.hardware.join(', ');
-		if (!featuresStr) featuresStr = '(none)';
-		log('Available features: '+featuresStr);
-
-		if (allGreen) {
-			log('ALL GREEN!', 'success');
-		}
-
-		// Update updaters list
-		$('#controller-btn').html(features.updaters.map(function (name) {
-			return '<option>'+name+'</option>';
-		}));
 	});
 
 	quad.client.on('disconnect', function () {
-		log('Connection closed.');
 		addAlert('Connection to server lost.', 'danger');
 	});
 

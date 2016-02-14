@@ -15,12 +15,14 @@ Client.prototype.connect = function (cb) {
 	if (!cb) cb = function () {};
 	var that = this;
 
+	this.emit('connecting');
+
 	var ws = new WebSocket('ws://'+window.location.host+'/socket');
 	ws.binaryType = 'arraybuffer';
 
 	ws.addEventListener('open', function () {
 		cb(null);
-		that.emit('connect');
+		that.emit('connected');
 	});
 
 	ws.addEventListener('error', function (event) {
