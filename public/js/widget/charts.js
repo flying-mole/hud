@@ -81,7 +81,17 @@ function Charts(quad) {
 
   quad.on('motors-speed', function (data) {
     var t = new Date().getTime();
-    append(motorsSpeed, t, data);
+    var axes = state.visibleAxes();
+
+    append(motorsSpeed, t, data.filter(function (item, i) {
+      if ((i === 0 || i === 2)) {
+        return (axes.indexOf('x') !== -1);
+      }
+      if ((i === 1 || i === 3)) {
+        return (axes.indexOf('y') !== -1);
+      }
+      return false;
+    }));
   });
 
   return state;
