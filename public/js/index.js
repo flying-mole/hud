@@ -5,11 +5,12 @@ var hg = require('mercury');
 var h = require('mercury').h;
 var Quadcopter = require('./quadcopter');
 var Console = require('./widget/console');
-var PowerBtn = require('./widget/power-btn');
+var EnableBtn = require('./widget/enable-btn');
 var ControllerBtn = require('./widget/controller-btn');
 var SystemSummary = require('./widget/system-summary');
 var Tabs = require('./widget/tabs');
 var Charts = require('./widget/charts');
+var PowerInput = require('./widget/power-input');
 var MouseDirection = require('./direction/mouse');
 
 function App() {
@@ -17,13 +18,14 @@ function App() {
 
 	var state = hg.state({
 		console: Console(quad),
-		powerBtn: PowerBtn(quad),
+		enableBtn: EnableBtn(quad),
 		controllerBtn: ControllerBtn(quad),
 		systemSummary: SystemSummary(quad),
 		directionTypeTabs: Tabs(['custom', 'step', 'sine', 'ramp']),
 		direction: hg.struct({
 			mouse: MouseDirection()
 		}),
+		powerInput: PowerInput(quad),
 		charts: Charts(quad)
 	});
 
@@ -38,7 +40,7 @@ App.render = function (state) {
 		h('hr'),
 		h('.container-fluid', h('.row', [
 			h('.col-lg-6.col-xs-12', [
-				hg.partial(PowerBtn.render, state.powerBtn),
+				hg.partial(EnableBtn.render, state.enableBtn),
 				hg.partial(ControllerBtn.render, state.controllerBtn)
 			]),
 			h('.col-lg-6.col-xs-12', [
@@ -55,7 +57,8 @@ App.render = function (state) {
 				Tabs.renderContainer(state.directionTypeTabs, 'custom', [
 					hg.partial(MouseDirection.render, state.direction.mouse)
 				])
-			])
+			]),
+			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput))
 		])),
 		hg.partial(Charts.render, state.charts)
 	]);
@@ -103,25 +106,6 @@ function init(quad) {
 	if (input.Gamepad.isSupported()) {
 		var gamepadInput = new input.Gamepad(quad.cmd);
 	}
-
-	var lastPower;
-	$('#power-input').on('input', function () {
-		var val = parseFloat($(this).val());
-		if (lastPower === val) {
-			return;
-		}
-
-		lastPower = val;
-		sendCommand('power', val / 100);
-	});
-	quad.cmd.on('power', function (val) {
-		if (lastPower / 100 === val) return;
-		$('#power-input').val(Math.round(val * 100));
-	});
-
-	$('#power-switch').change(function () {
-		sendCommand('enable', $(this).prop('checked'));
-	});
 
 	$('#controller-btn').change(function () {
 		quad.config.controller.updater = $(this).val();
@@ -541,16 +525,9 @@ $(function () {
 		schemas.sideX = new QuadcopterSchema('#quadcopter-side-x');
 		schemas.sideY = new QuadcopterSchema('#quadcopter-side-y');
 
-		// Init
-		log('Connecting to server...');
-		quad.init(function (err) {
-			if (err) return log(err, 'error');
-
 			init(quad);
 
-			log('Connected!');
 			removeAlert(connectingAlert);
-		});
 	});
 });
 */
