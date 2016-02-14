@@ -6,6 +6,7 @@ var h = require('mercury').h;
 var Quadcopter = require('./quadcopter');
 var Tabs = require('./component/tabs');
 var Console = require('./widget/console');
+var Alerts = require('./widget/alerts');
 var EnableBtn = require('./widget/enable-btn');
 var ControllerBtn = require('./widget/controller-btn');
 var SystemSummary = require('./widget/system-summary');
@@ -22,6 +23,7 @@ function App() {
 
 	var state = hg.state({
 		console: Console(quad),
+		alerts: Alerts(quad),
 		enableBtn: EnableBtn(quad),
 		controllerBtn: ControllerBtn(quad),
 		systemSummary: SystemSummary(quad),
@@ -82,7 +84,9 @@ App.render = function (state) {
 				hg.partial(OrientationSummary.render, state.orientationSummary)
 			]),
 		])),
-		hg.partial(Charts.render, state.charts)
+		hg.partial(Charts.render, state.charts),
+
+		hg.partial(Alerts.render, state.alerts)
 	]);
 };
 
@@ -247,16 +251,6 @@ $(function () {
 	var schemas = {};
 
 	var quad = new Quadcopter();
-
-	var $alerts = $('#alert-ctn');
-	function addAlert(msg, type) {
-		var $alert = $('<div></div>', { 'class': 'alert alert-'+type }).html(msg);
-		$alerts.append($alert);
-		return $alert;
-	}
-	function removeAlert($alert) {
-		$alert.remove();
-	}
 
 	// Add target to graphs export
 	(function () {
@@ -457,26 +451,7 @@ $(function () {
 		}
 	});
 
-	quad.client.on('disconnect', function () {
-		addAlert('Connection to server lost.', 'danger');
-	});
-
 	var cameraConfigHtml = $('#camera-config-inputs').html();
 	$('#camera-config-preview, #camera-config-record').html(cameraConfigHtml);
-	$('#camera-config-tabs').tabs();
-
-	var connectingAlert = addAlert('Connecting to server...', 'info');
-
-	// Inject SVGs into HTML to be able to style and animate them
-	var svgs = $('img[src$=".svg"]');
-	SVGInjector(svgs, null, function () {
-		schemas.top = new QuadcopterSchema('#quadcopter-top');
-		schemas.sideX = new QuadcopterSchema('#quadcopter-side-x');
-		schemas.sideY = new QuadcopterSchema('#quadcopter-side-y');
-
-			init(quad);
-
-			removeAlert(connectingAlert);
-	});
 });
 */
