@@ -20,6 +20,7 @@
   "dependencies": {
     "bootstrap": "^3.3.6",
     "broadway-player": "^0.1.1",
+    "browser-request": "^0.3.3",
     "c3": "^0.4.11-rc4",
     "events": "^1.0.2",
     "express": "^4.12.3",
@@ -33,6 +34,7 @@
     "mpu6050-dmp": "^0.0.6",
     "msgpack5": "^3.3.0",
     "node-pid-controller": "^0.1.2",
+    "round-to": "^1.1.0",
     "servoblaster": "^0.1.0",
     "smoothie": "^1.27.0",
     "stream-split": "^0.2.0",

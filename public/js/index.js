@@ -4,14 +4,16 @@ var document = require('global/document');
 var hg = require('mercury');
 var h = require('mercury').h;
 var Quadcopter = require('./quadcopter');
+var Tabs = require('./component/tabs');
 var Console = require('./widget/console');
 var EnableBtn = require('./widget/enable-btn');
 var ControllerBtn = require('./widget/controller-btn');
 var SystemSummary = require('./widget/system-summary');
-var Tabs = require('./widget/tabs');
 var Charts = require('./widget/charts');
 var PowerInput = require('./widget/power-input');
 var RotationInput = require('./widget/rotation-input');
+var Outline = require('./widget/outline');
+var MotorsSummary = require('./widget/motors-summary');
 var MouseDirection = require('./direction/mouse');
 
 function App() {
@@ -28,6 +30,12 @@ function App() {
 		}),
 		powerInput: PowerInput(quad),
 		rotationInput: RotationInput(quad),
+		outline: hg.struct({
+			top: Outline.Top(quad),
+			front: Outline.Front(quad),
+			right: Outline.Right(quad)
+		}),
+		motorsSummary: MotorsSummary(quad),
 		charts: Charts(quad)
 	});
 
@@ -61,7 +69,15 @@ App.render = function (state) {
 				])
 			]),
 			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
-			h('.col-lg-1.col-xs-6.text-center', hg.partial(RotationInput.render, state.rotationInput))
+			h('.col-lg-1.col-xs-6.text-center', hg.partial(RotationInput.render, state.rotationInput)),
+			h('.col-lg-3.col-xs-12.text-center', [
+				hg.partial(Outline.Top.render, state.outline.top),
+				hg.partial(MotorsSummary.render, state.motorsSummary)
+			]),
+			h('.col-lg-3.col-xs-12.text-center', [
+				hg.partial(Outline.Front.render, state.outline.front),
+				hg.partial(Outline.Right.render, state.outline.right)
+			]),
 		])),
 		hg.partial(Charts.render, state.charts)
 	]);
@@ -222,19 +238,6 @@ function init(quad) {
 		var url = URL.createObjectURL(blob);
 		window.open(url);
 	});
-
-	$('#graph-axes-btn').change(function () {
-		var val = $(this).val();
-
-		var axes;
-		if (val == '*') {
-			axes = null;
-		} else {
-			axes = [val];
-		}
-
-		graphs.axes = axes;
-	}).change();
 }
 
 $(function () {
@@ -287,26 +290,6 @@ $(function () {
 			}
 		}
 
-		var speedsRatio = [0, 0, 0, 0];
-		if (quad.config) {
-			var range = quad.config.servos.range;
-			speedsRatio = speeds.map(function (speed) {
-				return (speed - range[0]) / (range[1] - range[0]);
-			});
-		}
-
-		schemas.top.setSpeed(speedsRatio);
-		schemas.sideX.setSpeed(speedsRatio.slice(0, 2));
-		schemas.sideY.setSpeed(speedsRatio.slice(2, 4));
-
-		var speedsList = speeds;
-		if (quad.config) {
-			speedsList = speeds.map(function (speed, i) {
-				return quad.config.servos.pins[i] + ': ' + speed;
-			});
-		}
-		$('#motors-stats .motors-speed').html(speedsList.join('<br>'));
-
 		var exportedSpeeds = speeds.slice();
 		if (graphs.axes) {
 			if (graphs.axes.indexOf('x') == -1) {
@@ -321,20 +304,7 @@ $(function () {
 		graphsExport.append('motors-speed', timestamp, exportedSpeeds);
 	});
 
-	quad.on('motors-forces', function (forces) {
-		var forcesList = forces;
-		if (quad.config) {
-			var forcesList = forces.map(function (f, i) {
-				return quad.config.servos.pins[i] + ': ' + f;
-			});
-		}
-		$('#motors-stats .motors-forces').html(forcesList.join('<br>'));
-	});
-
 	quad.on('orientation', function (orientation) {
-		schemas.sideX.setRotation(orientation.rotation.x);
-		schemas.sideY.setRotation(orientation.rotation.y);
-
 		var objectValues = function (obj) {
 			var list = [];
 			for (var key in obj) {

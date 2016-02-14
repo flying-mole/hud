@@ -240,18 +240,18 @@ select {
 	border-color: rgba(0, 100, 200, 0.3);
 }
 
-.quadcopter-schema {
+.quadcopter-outline svg {
 	fill: rgb(58, 58, 58);
 	transition: 0.2s transform;
 }
-.quadcopter-schema g {
+.quadcopter-outline g {
 	transition: 0.2s fill;
 }
-#quadcopter-top {
+#quadcopter-outline-top {
 	width: 300px;
 	height: 300px;
 }
-.quadcopter-side {
+.quadcopter-outline-side {
 	width: 300px;
 	height: 75px;
 	margin: 37px 0;
