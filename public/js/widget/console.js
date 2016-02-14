@@ -38,6 +38,21 @@ function Console(quad) {
 		}
 	});
 
+	quad.on('motors-speed', function (speeds) {
+		if (!quad.config) {
+			return;
+		}
+
+		var range = quad.config.servos.range;
+		for (var i = 0; i < speeds.length; i++) {
+			var speed = speeds[i];
+			if (speed >= range[1]) {
+				// Max. motor power reached
+				log({ type: 'error', msg: 'Motor '+quad.config.servos.pins[i]+' is at full power!' });
+			}
+		}
+	});
+
 	quad.client.on('connecting', function () {
 		log('Connecting to server...');
 	});

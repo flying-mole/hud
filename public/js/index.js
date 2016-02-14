@@ -101,9 +101,6 @@ var CameraPreview = require('./camera-preview');
 var QuadcopterSchema = require('./quad-schema');
 var Quadcopter = require('./quadcopter');
 
-require('./jquery/serialize-object')($);
-require('./jquery/tabs')($);
-
 var input = {
 	Mouse: require('./input/mouse'),
 	DeviceOrientation: require('./input/device-orientation'),
@@ -272,17 +269,6 @@ $(function () {
 	})();
 
 	quad.on('motors-speed', function (speeds) {
-		if (quad.config) {
-			var range = quad.config.servos.range;
-			for (var i = 0; i < speeds.length; i++) {
-				var speed = speeds[i];
-				if (speed >= range[1]) {
-					// Max. motor power reached
-					log('Motor '+quad.config.servos.pins[i]+' is at full power!', 'error');
-				}
-			}
-		}
-
 		var exportedSpeeds = speeds.slice();
 		if (graphs.axes) {
 			if (graphs.axes.indexOf('x') == -1) {
