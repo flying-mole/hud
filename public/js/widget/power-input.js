@@ -33,7 +33,7 @@ function change(state, data) {
 PowerInput.render = function (state) {
 	return h('div', { title: 'Arrow up/down' }, [
 		h('strong', 'Power'),
-		h('input', {
+		h('input.power-input', {
 			type: 'range',
 			name: 'power',
 			value: state.value * 100,

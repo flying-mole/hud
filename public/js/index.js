@@ -11,6 +11,7 @@ var SystemSummary = require('./widget/system-summary');
 var Tabs = require('./widget/tabs');
 var Charts = require('./widget/charts');
 var PowerInput = require('./widget/power-input');
+var RotationInput = require('./widget/rotation-input');
 var MouseDirection = require('./direction/mouse');
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
 			mouse: MouseDirection()
 		}),
 		powerInput: PowerInput(quad),
+		rotationInput: RotationInput(quad),
 		charts: Charts(quad)
 	});
 
@@ -58,7 +60,8 @@ App.render = function (state) {
 					hg.partial(MouseDirection.render, state.direction.mouse)
 				])
 			]),
-			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput))
+			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
+			h('.col-lg-1.col-xs-6.text-center', hg.partial(RotationInput.render, state.rotationInput))
 		])),
 		hg.partial(Charts.render, state.charts)
 	]);

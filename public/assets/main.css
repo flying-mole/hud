@@ -150,10 +150,8 @@ input[type="range"][orient="vertical"]::-moz-range-track {
 	width: 5px;
 }
 
-#power-input {
-	width: 100px;
+.power-input {
 	height: 300px;
-	margin: auto;
 }
 
 select {
