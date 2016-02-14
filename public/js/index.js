@@ -14,6 +14,7 @@ var PowerInput = require('./widget/power-input');
 var RotationInput = require('./widget/rotation-input');
 var Outline = require('./widget/outline');
 var MotorsSummary = require('./widget/motors-summary');
+var OrientationSummary = require('./widget/orientation-summary');
 var MouseDirection = require('./direction/mouse');
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
 			right: Outline.Right(quad)
 		}),
 		motorsSummary: MotorsSummary(quad),
+		orientationSummary: OrientationSummary(quad),
 		charts: Charts(quad)
 	});
 
@@ -76,7 +78,8 @@ App.render = function (state) {
 			]),
 			h('.col-lg-3.col-xs-12.text-center', [
 				hg.partial(Outline.Front.render, state.outline.front),
-				hg.partial(Outline.Right.render, state.outline.right)
+				hg.partial(Outline.Right.render, state.outline.right),
+				hg.partial(OrientationSummary.render, state.orientationSummary)
 			]),
 		])),
 		hg.partial(Charts.render, state.charts)
@@ -255,10 +258,6 @@ $(function () {
 		$alert.remove();
 	}
 
-	quad.on('power', function (power) {
-		$('#power-input').val(Math.round(power * 100));
-	});
-
 	// Add target to graphs export
 	(function () {
 		var target;
@@ -305,24 +304,6 @@ $(function () {
 	});
 
 	quad.on('orientation', function (orientation) {
-		var objectValues = function (obj) {
-			var list = [];
-			for (var key in obj) {
-				var val = obj[key];
-				if (typeof val == 'number') { // Only keep two digits after the comma
-					val = Math.round(val * 100) / 100;
-				}
-				list.push(val);
-			}
-			return list;
-		};
-
-		var $stats = $('#sensor-stats');
-		$stats.find('.sensor-gyro').text(objectValues(orientation.gyro));
-		$stats.find('.sensor-accel').text(objectValues(orientation.accel));
-		$stats.find('.sensor-rotation').text(objectValues(orientation.rotation));
-		$stats.find('.sensor-temp').text(Math.round(orientation.temp));
-
 		// Graphs
 		var timestamp = new Date().getTime();
 

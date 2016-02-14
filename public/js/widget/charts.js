@@ -3,7 +3,7 @@
 var hg = require('mercury');
 var h = require('mercury').h;
 var smoothie = require('smoothie');
-var StreamingChart = require('./streaming-chart');
+var StreamingChart = require('../component/streaming-chart');
 
 var lineStyle = {
 	red: { strokeStyle: 'rgb(255, 0, 0)' },
