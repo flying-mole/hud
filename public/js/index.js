@@ -80,7 +80,7 @@ App.render = function (state) {
 		h('hr'),
 		h('.container-fluid', h('.row', [
 			h('.col-lg-3.col-xs-6.text-center', [ // .hidden-xs.hidden-sm
-				h('', [
+				h('div', [
 					h('strong', 'Direction'),
 					hg.partial(Tabs.render, state.directionTypeTabs)
 				]),

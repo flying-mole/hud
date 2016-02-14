@@ -22,23 +22,6 @@
 				</div>
 			</div>
 			<div class="col-lg-3 col-xs-6 hidden-xs hidden-sm text-center">
-				<div>
-					<strong>Direction</strong>
-
-					<ul class="nav nav-tabs nav-justified" id="direction-type-tabs">
-						<li class="active"><a href="#direction-custom">custom</a></li>
-						<li><a href="#direction-step">step</a></li>
-						<li><a href="#direction-sine">sine</a></li>
-						<li><a href="#direction-ramp">ramp</a></li>
-					</ul>
-				</div>
-
-				<div id="direction-custom">
-					<div id="direction-input" class="joystick">
-						<div class="handle"></div>
-					</div>
-				</div>
-
 				<form id="direction-step" class="form-inline">
 					<div>
 						x: <input type="number" name="x" value="0" step="any" class="form-control"> °
@@ -151,33 +134,6 @@
 				</div>
 
 				<p id="sensor-status-recording" class="text-danger" style="display: none;">Recording...</p>
-			</div>
-
-			<div class="col-lg-4 col-xs-12 graph-ctn">
-				<strong>Gyro</strong>
-				<canvas id="sensor-gyro-graph" width="400" height="100"></canvas>
-			</div>
-			<div class="col-lg-4 col-xs-12 graph-ctn">
-				<strong>Accel</strong>
-				<canvas id="sensor-accel-graph" width="400" height="100"></canvas>
-			</div>
-			<div class="col-lg-4 col-xs-12 graph-ctn">
-				<strong>Rotation</strong>
-				<canvas id="sensor-rotation-graph" width="400" height="100"></canvas>
-			</div>
-			<div class="col-lg-4 col-xs-12 graph-ctn">
-				<strong>Motors speed</strong>
-				<canvas id="motors-speed-graph" width="400" height="100"></canvas>
-			</div>
-			<div class="col-lg-4 col-xs-12">
-				<strong>Graphs settings</strong>
-				<div class="form-inline">
-					<label class="control-label" for="graph-axes-btn">Show axes:</label>
-					<select id="graph-axes-btn" class="form-control">
-						<option value="*">x, y, z</option>
-						<option>x</option>
-					</select>
-				</div>
 			</div>
 		</div>
 	</div>
