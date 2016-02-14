@@ -107,11 +107,6 @@ function init(quad) {
 		var gamepadInput = new input.Gamepad(quad.cmd);
 	}
 
-	$('#controller-btn').change(function () {
-		quad.config.controller.updater = $(this).val();
-		sendCommand('config', quad.config);
-	});
-
 	$('#direction-type-tabs').tabs();
 
 	var stepInput = new input.Step(quad.cmd);
