@@ -13,7 +13,7 @@ function PowerBtn(quad) {
 
   hg.watch(state.value, function (val) {
     if (quad.enabled == val) return;
-    quad.cmd.send('enable', val);
+    quad.cmd.send('enable', val); // TODO: move this in change() ?
   });
 
   quad.on('enabled', function (val) {

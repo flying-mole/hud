@@ -6,6 +6,10 @@ var h = require('mercury').h;
 var Quadcopter = require('./quadcopter');
 var PowerBtn = require('./widget/power-btn');
 var ControllerBtn = require('./widget/controller-btn');
+var SystemSummary = require('./widget/system-summary');
+var Tabs = require('./widget/tabs');
+var MouseDirection = require('./direction/mouse');
+var buildCharts = require('./charts-build');
 
 function App() {
 	var quad = new Quadcopter();
@@ -15,6 +19,12 @@ function App() {
 		quad: quad,
 		powerBtn: PowerBtn(quad),
 		controllerBtn: ControllerBtn(quad),
+		systemSummary: SystemSummary(quad),
+		directionTypeTabs: Tabs(['custom', 'step', 'sine', 'ramp']),
+		direction: hg.struct({
+			mouse: MouseDirection()
+		}),
+		charts: hg.struct(buildCharts(quad)),
 		channels: {
 			log: log
 		}
@@ -51,24 +61,40 @@ function log(state, data) {
 }
 
 App.render = function (state) {
-	return h('div#app', [
-		h('div#console.container-fluid', [
-			h('pre', state.console.map(renderLog))
+	return h('#app', [
+		h('#console.container-fluid', [
+			h('pre', state.console.map(function (item) {
+				return h('span.' + (item.type || 'log'), item.msg + '\n');
+			}))
 		]),
 		h('hr'),
-		h('div.container-fluid', h('div.row', [
-			h('div.col-lg-6.col-xs-12', [
+		h('.container-fluid', h('.row', [
+			h('.col-lg-6.col-xs-12', [
 				hg.partial(PowerBtn.render, state.powerBtn),
 				hg.partial(ControllerBtn.render, state.controllerBtn)
 			]),
-			h('div.col-lg-6.col-xs-12', [])
-		]))
+			h('.col-lg-6.col-xs-12', [
+				hg.partial(SystemSummary.render, state.systemSummary)
+			])
+		])),
+		h('hr'),
+		h('.container-fluid', h('.row', [
+			h('.col-lg-3.col-xs-6.text-center', [ // .hidden-xs.hidden-sm
+				h('', [
+					h('strong', 'Direction'),
+					hg.partial(Tabs.render, state.directionTypeTabs)
+				]),
+				Tabs.renderContainer(state.directionTypeTabs, 'custom', [
+					hg.partial(MouseDirection.render, state.direction.mouse)
+				])
+			])
+		])),
+		h('.container-fluid', h('.row', [
+			h('.col-lg-4.col-xs-12.graph-ctn', state.charts.gyro),
+			h('.col-lg-4.col-xs-12.graph-ctn', state.charts.accel)
+		])),
 	]);
 };
-
-function renderLog(item) {
-	return h('span.' + (item.type || 'log'), item.msg + '\n');
-}
 
 hg.app(document.body, App(), App.render);
 
