@@ -76,6 +76,9 @@ template {
 	box-shadow: none;
 	border-bottom-color: rgba(0, 100, 200, 0.3);
 }
+.form-control:invalid {
+	border-bottom-color: rgba(255, 0, 0, 0.2);
+}
 input[type="number"].form-control {
 	-moz-appearance: textfield;
 }

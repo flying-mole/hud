@@ -18,6 +18,7 @@ var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
 var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
+var StepDirection = require('./direction/step');
 
 function App() {
 	var quad = new Quadcopter();
@@ -28,10 +29,11 @@ function App() {
 		enableBtn: EnableBtn(quad),
 		controllerBtn: ControllerBtn(quad),
 		systemSummary: SystemSummary(quad),
-		directionTypeTabs: Tabs(['custom', 'step', 'sine', 'ramp']),
+		directionTabs: Tabs(['custom', 'step', 'sine', 'ramp']),
 		direction: hg.struct({
 			mouse: MouseDirection(),
-			deviceOrientation: DeviceOrientationDirection()
+			deviceOrientation: DeviceOrientationDirection(),
+			step: StepDirection()
 		}),
 		powerInput: PowerInput(quad),
 		rotationInput: RotationInput(quad),
@@ -68,11 +70,14 @@ App.render = function (state) {
 			h('.col-lg-3.col-xs-6.text-center', [ // .hidden-xs.hidden-sm
 				h('div', [
 					h('strong', 'Direction'),
-					hg.partial(Tabs.render, state.directionTypeTabs)
+					hg.partial(Tabs.render, state.directionTabs)
 				]),
-				Tabs.renderContainer(state.directionTypeTabs, 'custom', [
+				Tabs.renderContainer(state.directionTabs, 'custom', [
 					hg.partial(MouseDirection.render, state.direction.mouse),
 					hg.partial(DeviceOrientationDirection.render, state.direction.deviceOrientation)
+				]),
+				Tabs.renderContainer(state.directionTabs, 'step', [
+					hg.partial(StepDirection.render, state.direction.step)
 				])
 			]),
 			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
