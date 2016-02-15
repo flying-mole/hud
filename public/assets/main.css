@@ -243,6 +243,9 @@ select {
 	border-color: rgba(0, 100, 200, 0.3);
 }
 
+.quadcopter-outline {
+	margin: auto;
+}
 .quadcopter-outline svg {
 	fill: rgb(58, 58, 58);
 	transition: 0.2s transform;
@@ -257,7 +260,7 @@ select {
 .quadcopter-outline-side {
 	width: 300px;
 	height: 75px;
-	margin: 37px 0;
+	margin-top: 37px;
 }
 
 #camera-video canvas {

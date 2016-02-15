@@ -16,6 +16,7 @@ var RotationInput = require('./widget/rotation-input');
 var Outline = require('./widget/outline');
 var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
+var CalibrateBtn = require('./widget/calibrate-btn');
 var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
 var GamepadDirection = require('./direction/gamepad');
@@ -50,6 +51,7 @@ function App() {
 		}),
 		motorsSummary: MotorsSummary(quad),
 		orientationSummary: OrientationSummary(quad),
+		calibrateBtn: CalibrateBtn(quad),
 		charts: Charts(quad)
 	});
 
@@ -102,7 +104,8 @@ App.render = function (state) {
 			h('.col-lg-3.col-xs-12.text-center', [
 				hg.partial(Outline.Front.render, state.outline.front),
 				hg.partial(Outline.Right.render, state.outline.right),
-				hg.partial(OrientationSummary.render, state.orientationSummary)
+				hg.partial(OrientationSummary.render, state.orientationSummary),
+				hg.partial(CalibrateBtn.render, state.calibrateBtn)
 			]),
 		])),
 		hg.partial(Charts.render, state.charts),
@@ -195,26 +198,6 @@ function init(quad) {
 	});
 	$('#direction-ramp-stop').click(function () {
 		rampInput.stop();
-	});
-
-	$('#calibrate-sensor-btn').click(function () {
-		var calibration = $.extend(true, {}, quad.config.mpu6050.calibration);
-		var types = ['gyro', 'accel', 'rotation'];
-		for (var i = 0; i < types.length; i++) {
-			var type = types[i];
-			if (!calibration[type]) {
-				calibration[type] = { x: 0, y: 0, z: 0 };
-			}
-			for (var axis in quad.orientation[type]) {
-				calibration[type][axis] -= quad.orientation[type][axis];
-			}
-		}
-
-		// z accel is 1, because of gravitation :-P
-		calibration.accel.z += 1;
-
-		quad.config.mpu6050.calibration = calibration;
-		sendCommand('config', quad.config);
 	});
 
 	var cameraPreview = new CameraPreview(quad.cmd);
