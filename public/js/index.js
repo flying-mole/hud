@@ -18,6 +18,7 @@ var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
 var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
+var GamepadDirection = require('./direction/gamepad');
 var StepDirection = require('./direction/step');
 var SineDirection = require('./direction/sine');
 var RampDirection = require('./direction/ramp');
@@ -35,6 +36,7 @@ function App() {
 		direction: hg.struct({
 			mouse: MouseDirection(),
 			deviceOrientation: DeviceOrientationDirection(),
+			gamepad: GamepadDirection(),
 			step: StepDirection(),
 			sine: SineDirection(),
 			ramp: RampDirection()
@@ -78,7 +80,8 @@ App.render = function (state) {
 				]),
 				Tabs.renderContainer(state.directionTabs, 'custom', [
 					hg.partial(MouseDirection.render, state.direction.mouse),
-					hg.partial(DeviceOrientationDirection.render, state.direction.deviceOrientation)
+					hg.partial(DeviceOrientationDirection.render, state.direction.deviceOrientation),
+					hg.partial(GamepadDirection.render, state.direction.gamepad)
 				]),
 				Tabs.renderContainer(state.directionTabs, 'step', [
 					hg.partial(StepDirection.render, state.direction.step)
