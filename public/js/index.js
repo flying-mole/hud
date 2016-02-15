@@ -20,6 +20,7 @@ var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
 var StepDirection = require('./direction/step');
 var SineDirection = require('./direction/sine');
+var RampDirection = require('./direction/ramp');
 
 function App() {
 	var quad = new Quadcopter();
@@ -35,7 +36,8 @@ function App() {
 			mouse: MouseDirection(),
 			deviceOrientation: DeviceOrientationDirection(),
 			step: StepDirection(),
-			sine: SineDirection()
+			sine: SineDirection(),
+			ramp: RampDirection()
 		}),
 		powerInput: PowerInput(quad),
 		rotationInput: RotationInput(quad),
@@ -83,6 +85,9 @@ App.render = function (state) {
 				]),
 				Tabs.renderContainer(state.directionTabs, 'sine', [
 					hg.partial(SineDirection.render, state.direction.sine)
+				]),
+				Tabs.renderContainer(state.directionTabs, 'ramp', [
+					hg.partial(RampDirection.render, state.direction.ramp)
 				])
 			]),
 			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),

@@ -3,7 +3,7 @@
 var hg = require('mercury');
 var h = require('mercury').h;
 
-function SineDirection() {
+function RampDirection() {
 	return hg.state({
 		x: hg.value(0),
 		y: hg.value(0),
@@ -11,9 +11,8 @@ function SineDirection() {
 
 		enabled: hg.value(false),
 		axis: hg.value('x'),
-		amplitude: hg.value(0),
-		frequency: hg.value(0),
-		offset: hg.value(0),
+		slope: hg.value(0),
+		max: hg.value(0),
 
 		channels: {
 			start: start,
@@ -30,14 +29,12 @@ function start(state, data) {
 	state.enabled.set(true);
 
 	state.axis.set(data.axis);
-	state.amplitude.set(parseFloat(data.amplitude) || 0);
-	state.frequency.set(parseFloat(data.frequency) || 0);
-	state.offset.set(parseFloat(data.offset) || 0);
+	state.slope.set(parseFloat(data.slope) || 0);
+	state.max.set(parseFloat(data.max) || 0);
 
 	var axis = state.axis(),
-		A = state.amplitude(),
-		f = state.frequency(),
-		phi = state.offset();
+		slope = state.slope(),
+		max = state.max();
 
 	// Reset axis
 	state[axis].set(0);
@@ -45,8 +42,17 @@ function start(state, data) {
 	var startedAt = Date.now();
 	var interval = setInterval(function () {
 		var t = (Date.now() - startedAt) / 1000;
+		var val = t * slope;
 
-		state[axis].set(A * Math.sin(2 * Math.PI * f * t + phi));
+		if (val > max) {
+			val = max;
+		}
+
+		state[axis].set(val);
+
+		if (val === max) {
+			stop(state);
+		}
 	}, 200);
 
 	var removeListener = state.enabled(function (val) {
@@ -61,7 +67,7 @@ function stop(state) {
 	state.enabled.set(false);
 }
 
-SineDirection.render = function (state) {
+RampDirection.render = function (state) {
 	return h('form.form-inline', { 'ev-submit': hg.sendSubmit(state.channels.start) }, [
 		h('div', [
 			'Axis: ',
@@ -69,9 +75,8 @@ SineDirection.render = function (state) {
 				return h('option', { selected: (state.axis === axis) }, axis);
 			}))
 		]),
-		h('div', ['Amplitude: ', h('input.form-control', { type: 'number', name: 'amplitude', value: state.amplitude, step: 'any' }), ' °']),
-		h('div', ['Frequency: ', h('input.form-control', { type: 'number', name: 'frequency', value: state.frequency, step: 'any' }), ' Hz']),
-		h('div', ['Offset: ', h('input.form-control', { type: 'number', name: 'offset', value: state.offset, step: 'any' }), ' rad']),
+		h('div', ['Slope: ', h('input.form-control', { type: 'number', name: 'slope', value: state.slope, step: 'any' }), ' °/s']),
+		h('div', ['Max: ', h('input.form-control', { type: 'number', name: 'max', value: state.max, step: 'any' }), ' °']),
 		h('br'),
 		h('.btn-group', [
 			h('button.btn.btn-primary', { type: 'submit' }, 'Start'),
@@ -82,4 +87,4 @@ SineDirection.render = function (state) {
 	]);
 };
 
-module.exports = SineDirection;
+module.exports = RampDirection;
