@@ -19,6 +19,7 @@ var OrientationSummary = require('./widget/orientation-summary');
 var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
 var StepDirection = require('./direction/step');
+var SineDirection = require('./direction/sine');
 
 function App() {
 	var quad = new Quadcopter();
@@ -33,7 +34,8 @@ function App() {
 		direction: hg.struct({
 			mouse: MouseDirection(),
 			deviceOrientation: DeviceOrientationDirection(),
-			step: StepDirection()
+			step: StepDirection(),
+			sine: SineDirection()
 		}),
 		powerInput: PowerInput(quad),
 		rotationInput: RotationInput(quad),
@@ -78,6 +80,9 @@ App.render = function (state) {
 				]),
 				Tabs.renderContainer(state.directionTabs, 'step', [
 					hg.partial(StepDirection.render, state.direction.step)
+				]),
+				Tabs.renderContainer(state.directionTabs, 'sine', [
+					hg.partial(SineDirection.render, state.direction.sine)
 				])
 			]),
 			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
