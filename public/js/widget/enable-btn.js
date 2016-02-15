@@ -2,13 +2,14 @@
 
 var hg = require('mercury');
 var h = require('mercury').h;
+var Switch = require('../component/switch');
 
 function EnableBtn(quad) {
+	var sw = Switch('enable-switch');	
+
 	var state = hg.state({
-		value: hg.value(false),
-		channels: {
-			change: change
-		}
+		switch: sw,
+		value: sw.value
 	});
 
 	hg.watch(state.value, function (val) {
@@ -23,23 +24,10 @@ function EnableBtn(quad) {
 	return state;
 }
 
-function change(state, value) {
-	state.value.set(value.enabled);
-}
-
 EnableBtn.render = function (state) {
 	return h('div', { title: 'Alt+S to start/stop, Esc to stop' }, [
-		h('div.switch', [
-			h('input', {
-				type: 'checkbox',
-				id: 'enable-switch',
-				name: 'enabled',
-				checked: state.value,
-				'ev-event': hg.sendChange(state.channels.change)
-			}),
-			h('label', { htmlFor: 'enable-switch' })
-		]),
-		h('label', { htmlFor: 'enable-switch' }, 'ENABLE')
+		Switch.render(state.switch),
+		h('label', { htmlFor: state.switch.id }, 'ENABLE')
 	]);
 };
 
