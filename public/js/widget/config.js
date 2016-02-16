@@ -47,14 +47,14 @@ Config.render = function (state) {
 
 	return h('form.form-horizontal', { 'ev-submit': hg.sendSubmit(state.channels.change) }, [
 		h('.row', [
-			h('.col-md-6', [
+			h('.col-sm-6', [
 				hg.partial(servos, state.config.servos),
 				hg.partial(broadcastInterval, state.config.broadcastInterval),
 				//hg.partial(physics, state.config.physics)
 			]),
-			h('.col-md-6', controller(state.config))
+			h('.col-sm-6', controller(state.config))
 		]),
-		h('.row', h('.col-md-6', h('.form-group', h('.col-sm-offset-2.col-sm-10', [
+		h('.row', h('.col-xs-12', h('.form-group', h('.col-sm-offset-2.col-sm-10', [
 			h('button.btn.btn-primary', { type: 'submit' }, 'Update'),
 			' ',
 			h('button.btn.btn-default', { type: 'button' }, 'Export')
@@ -190,8 +190,8 @@ function pid(prefix, values) {
 
 function formGroup(label, inputs) {
 	return h('.form-group', [
-		h('label.col-sm-2.control-label', label),
-		h('.col-sm-10.form-inline', inputs)
+		h('label.col-md-2.control-label', label),
+		h('.col-md-10.form-inline', inputs)
 	]);
 }
 

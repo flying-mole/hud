@@ -70,11 +70,11 @@ App.render = function (state) {
 		hg.partial(Console.render, state.console),
 		h('hr'),
 		h('.container-fluid', h('.row', [
-			h('.col-lg-6.col-xs-12', [
+			h('.col-sm-6.col-xs-12', [
 				hg.partial(EnableBtn.render, state.enableBtn),
 				hg.partial(ControllerBtn.render, state.controllerBtn)
 			]),
-			h('.col-lg-6.col-xs-12', [
+			h('.col-sm-6.col-xs-12', [
 				hg.partial(SystemSummary.render, state.systemSummary)
 			])
 		])),
@@ -100,20 +100,21 @@ App.render = function (state) {
 					hg.partial(RampDirection.render, state.direction.ramp)
 				])
 			]),
-			h('.col-lg-2.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
-			h('.col-lg-1.col-xs-6.text-center', hg.partial(RotationInput.render, state.rotationInput)),
-			h('.col-lg-3.col-xs-12.text-center', [
+			h('.col-lg-2.col-sm-3.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
+			h('.col-lg-1.col-sm-3.col-xs-6.text-center', hg.partial(RotationInput.render, state.rotationInput)),
+			h('span.clearfix.visible-sm'),
+			h('.col-lg-3.col-sm-6.col-xs-12.text-center', [
 				hg.partial(Outline.Top.render, state.outline.top),
 				hg.partial(MotorsSummary.render, state.motorsSummary)
 			]),
-			h('.col-lg-3.col-xs-12.text-center', [
+			h('.col-lg-3.col-sm-6.col-xs-12.text-center', [
 				hg.partial(Outline.Front.render, state.outline.front),
 				hg.partial(Outline.Right.render, state.outline.right),
 				hg.partial(OrientationSummary.render, state.orientationSummary),
 				hg.partial(CalibrateBtn.render, state.calibrateBtn)
 			]),
 		])),
-		hg.partial(Charts.render, state.charts),
+		h('.container-fluid', hg.partial(Charts.render, state.charts)),
 		h('hr'),
 		h('.container-fluid', hg.partial(Config.render, state.config)),
 

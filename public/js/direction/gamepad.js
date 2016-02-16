@@ -57,7 +57,7 @@ function connected(state, gamepad) {
 }
 
 GamepadDirection.render = function (state) {
-	return h('.text-center', (state.enabled) ? 'Gamepad connected' : 'Connect a gamepad');
+	return h('p.text-center', (state.enabled) ? 'Gamepad connected' : 'Connect a gamepad');
 };
 
 module.exports = GamepadDirection;

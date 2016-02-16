@@ -106,24 +106,24 @@ function changeVisibleAxes(state, data) {
 }
 
 Charts.render = function (state) {
-	return h('.container-fluid', h('.row', [
-		h('.col-lg-4.col-xs-12.graph-ctn', [
+	return h('.row', [
+		h('.col-lg-4.col-sm-6.col-xs-12.graph-ctn', [
 			h('strong', 'Gyro'),
 			state.charts.gyro
 		]),
-		h('.col-lg-4.col-xs-12.graph-ctn', [
+		h('.col-lg-4.col-sm-6.col-xs-12.graph-ctn', [
 			h('strong', 'Accel'),
 			state.charts.accel
 		]),
-		h('.col-lg-4.col-xs-12.graph-ctn', [
+		h('.col-lg-4.col-sm-6.col-xs-12.graph-ctn', [
 			h('strong', 'Rotation'),
 			state.charts.rotation
 		]),
-		h('.col-lg-4.col-xs-12.graph-ctn', [
+		h('.col-lg-4.col-sm-6.col-xs-12.graph-ctn', [
 			h('strong', 'Motors speed'),
 			state.charts.motorsSpeed
 		]),
-		h('.col-lg-4.col-xs-12', [
+		h('.col-lg-4.col-sm-6.col-xs-12', [
 			h('strong', 'Graphs settings'),
 			h('.form-inline', [
 				h('label', { htmlFor: 'chart-axes-btn' }, 'Show axes:'),
@@ -138,7 +138,7 @@ Charts.render = function (state) {
 				])
 			])
 		])
-	]));
+	]);
 };
 
 module.exports = Charts;
