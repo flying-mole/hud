@@ -1,5 +1,6 @@
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+var extend = require('extend');
 
 var MsgHandler = require('./msg-handler');
 var Client = require('./client');
@@ -39,7 +40,7 @@ function Quadcopter() {
 				return that._config;
 			},
 			set: function (val) {
-				that.cmd.send('config', val);
+				that.setConfig(val);
 			}
 		},
 		power: {
@@ -102,6 +103,11 @@ Quadcopter.prototype.init = function (cb) {
 
 		cb(null);
 	});
+};
+
+Quadcopter.prototype.setConfig = function (config) {
+	extend(this._config, config);
+	this.cmd.send('config', config);
 };
 
 module.exports = Quadcopter;

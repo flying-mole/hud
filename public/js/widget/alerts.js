@@ -19,6 +19,7 @@ function Alerts(quad) {
 	quad.client.on('connecting', function () {
 		var remove = add({ type: 'info', msg: 'Connecting to server...' });
 		quad.client.once('connected', remove);
+		quad.client.once('error', remove);
 	});
 
 	return state;

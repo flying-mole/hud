@@ -26,6 +26,7 @@ Client.prototype.connect = function (cb) {
 	});
 
 	ws.addEventListener('error', function (event) {
+		var error = 'Websocket error';
 		cb(error);
 		that.emit('error', error);
 	});

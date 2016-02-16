@@ -5,28 +5,25 @@ var h = require('mercury').h;
 
 function ControllerBtn(quad) {
 	var state = hg.state({
-		value: hg.value(null),
+		value: hg.value('dummy'),
 		updaters: hg.array([]),
 		channels: {
-			change: change
+			change: function (state, data) {
+				state.value.set(data.controller);
+				quad.setConfig({ controller: { updater: data.controller } });
+			}
 		}
-	});
-
-	hg.watch(state.value, function (val) {
-		if (!val || !quad.config) return;
-		quad.config.controller.updater = val;
-		//quad.cmd.send('config', quad.config);
 	});
 
 	quad.on('features', function (data) {
 		state.updaters.set(data.updaters);
 	});
 
-	return state;
-}
+	quad.on('config', function (config) {
+		state.value.set(config.controller.updater);
+	});
 
-function change(state, value) {
-	state.value.set(value.controller);
+	return state;
 }
 
 ControllerBtn.render = function (state) {
@@ -36,7 +33,7 @@ ControllerBtn.render = function (state) {
 			name: 'controller',
 			'ev-event': hg.sendChange(state.channels.change)
 		}, state.updaters.map(function (name) {
-			return h('option', name);
+			return h('option', { selected: (state.value === name) }, name);
 		}))
 	]);
 };

@@ -3,8 +3,10 @@
 var document = require('global/document');
 var hg = require('mercury');
 var h = require('mercury').h;
+
 var Quadcopter = require('./quadcopter');
 var Tabs = require('./component/tabs');
+
 var Console = require('./widget/console');
 var Alerts = require('./widget/alerts');
 var EnableBtn = require('./widget/enable-btn');
@@ -17,6 +19,8 @@ var Outline = require('./widget/outline');
 var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
 var CalibrateBtn = require('./widget/calibrate-btn');
+var Config = require('./widget/config');
+
 var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
 var GamepadDirection = require('./direction/gamepad');
@@ -52,7 +56,8 @@ function App() {
 		motorsSummary: MotorsSummary(quad),
 		orientationSummary: OrientationSummary(quad),
 		calibrateBtn: CalibrateBtn(quad),
-		charts: Charts(quad)
+		charts: Charts(quad),
+		config: Config(quad)
 	});
 
 	quad.init();
@@ -109,6 +114,8 @@ App.render = function (state) {
 			]),
 		])),
 		hg.partial(Charts.render, state.charts),
+		h('hr'),
+		h('.container-fluid', hg.partial(Config.render, state.config)),
 
 		hg.partial(Alerts.render, state.alerts)
 	]);

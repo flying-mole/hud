@@ -86,6 +86,9 @@ input[type="number"].form-control {
 .form-inline input[type="number"].form-control {
 	width: 65px;
 }
+.form-inline input[type="number"][size="1"].form-control {
+	width: 35px;
+}
 
 #console {
 	height: 200px;
