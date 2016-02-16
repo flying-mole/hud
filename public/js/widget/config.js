@@ -4,6 +4,7 @@ var hg = require('mercury');
 var h = require('mercury').h;
 var extend = require('extend');
 var expand = require('expand-flatten').expand;
+var exportFile = require('../export');
 
 function Config(quad) {
 	var state = hg.state({
@@ -12,6 +13,12 @@ function Config(quad) {
 			change: function (state, data) {
 				data = cast(state.config(), expand(data));
 				console.log('change', data); // TODO
+			},
+			export: function (state) {
+				exportFile({
+					type: 'application/json',
+					body: JSON.stringify(state.config(), null, '\t')
+				});
 			}
 		}
 	});
@@ -57,7 +64,10 @@ Config.render = function (state) {
 		h('.row', h('.col-xs-12', h('.form-group', h('.col-sm-offset-2.col-sm-10', [
 			h('button.btn.btn-primary', { type: 'submit' }, 'Update'),
 			' ',
-			h('button.btn.btn-default', { type: 'button' }, 'Export')
+			h('button.btn.btn-default', {
+				type: 'button',
+				'ev-click': hg.sendClick(state.channels.export)
+			}, 'Export')
 		]))))
 	]);
 };

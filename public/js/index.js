@@ -257,8 +257,6 @@ function init(quad) {
 }
 
 $(function () {
-	var schemas = {};
-
 	var quad = new Quadcopter();
 
 	// Add target to graphs export
@@ -321,96 +319,6 @@ $(function () {
 
 	// TODO: handle multiple config changes
 	quad.once('config', function (cfg) {
-		var accessor = function (prop, value) {
-			var path = prop.split('.');
-
-			var obj = cfg;
-			for (var i = 0; i < path.length; i++) {
-				var node = path[i];
-				if (obj instanceof Array) {
-					node = parseInt(node);
-				}
-
-				if (typeof obj[node] == 'undefined') {
-					return;
-				}
-
-				if (i == path.length - 1) { // Last one
-					if (typeof value == 'undefined') {
-						return obj[node];
-					} else {
-						obj[node] = value;
-					}
-				} else {
-					obj = obj[node];
-					if (!obj) return;
-				}
-			}
-
-			return obj;
-		};
-
-		var handleInput = function (input, domain) {
-			var name = $(input).attr('name');
-			if (!name) {
-				return;
-			}
-			if (domain) {
-				name = domain+'.'+name;
-			}
-
-			var val = accessor(name);
-			if (typeof val != 'undefined') {
-				if ($(input).is('input')) {
-					$(input).attr('value', val);
-				} else if ($(input).is('select')) {
-					$(input).find('option').each(function () {
-						var name = $(this).attr('value');
-						if (typeof name == 'undefined') {
-							name = $(this).html();
-						}
-						if (name == val) {
-							$(this).attr('selected', '');
-						}
-					});
-				}
-				$(input).val(val);
-			}
-
-			$(input).change(function () {
-				var val = $(input).val();
-				if ($(input).is('input')) {
-					var type = $(input).attr('type');
-					switch (type) {
-						case 'number':
-						case 'range':
-							val = parseFloat(val);
-							break;
-						case 'checkbox':
-							val = $(input).prop('checked');
-							break;
-					}
-				}
-				accessor(name, val);
-			});
-		};
-
-		var $form = $('#config-form');
-		$form.find('input,select').each(function (i, input) {
-			handleInput(input);
-		});
-		$form.submit(function (event) {
-			event.preventDefault();
-
-			sendCommand('config', cfg);
-		});
-		$form.find('#export-config-btn').click(function () {
-			var json = JSON.stringify(cfg, null, '\t');
-			var blob = new Blob([json], { type: 'application/json' });
-			var url = URL.createObjectURL(blob);
-			window.open(url);
-		});
-
 		// Camera config
 		function initCameraConfigForm(form, type) {
 			var $form = $(form);
