@@ -23,6 +23,7 @@
     "browser-request": "^0.3.3",
     "c3": "^0.4.11-rc4",
     "events": "^1.0.2",
+    "expand-flatten": "^1.0.0",
     "express": "^4.12.3",
     "express-browserify-lite": "^0.1.2",
     "express-ws": "^0.2.6",
