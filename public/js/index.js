@@ -19,6 +19,7 @@ var Outline = require('./widget/outline');
 var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
 var CalibrateBtn = require('./widget/calibrate-btn');
+var Camera = require('./widget/camera');
 var Config = require('./widget/config');
 
 var MouseDirection = require('./direction/mouse');
@@ -57,6 +58,7 @@ function App() {
 		orientationSummary: OrientationSummary(quad),
 		calibrateBtn: CalibrateBtn(quad),
 		charts: Charts(quad),
+		camera: Camera(quad),
 		config: Config(quad)
 	});
 
@@ -68,6 +70,7 @@ function App() {
 App.render = function (state) {
 	return h('#app', [
 		hg.partial(Console.render, state.console),
+
 		h('hr'),
 		h('.container-fluid', h('.row', [
 			h('.col-sm-6.col-xs-12', [
@@ -78,6 +81,7 @@ App.render = function (state) {
 				hg.partial(SystemSummary.render, state.systemSummary)
 			])
 		])),
+
 		h('hr'),
 		h('.container-fluid', h('.row', [
 			h('.col-lg-3.col-xs-6.text-center', [ // .hidden-xs.hidden-sm
@@ -115,6 +119,12 @@ App.render = function (state) {
 			]),
 		])),
 		h('.container-fluid', hg.partial(Charts.render, state.charts)),
+
+		h('#camera', [
+			h('hr'),
+			h('.container-fluid', hg.partial(Camera.render, state.camera))
+		]),
+
 		h('hr'),
 		h('.container-fluid', hg.partial(Config.render, state.config)),
 

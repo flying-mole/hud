@@ -5,6 +5,7 @@ var h = require('mercury').h;
 var extend = require('extend');
 var expand = require('expand-flatten').expand;
 var exportFile = require('../export');
+var formGroup = require('../component/form-group');
 
 function Config(quad) {
 	var state = hg.state({
@@ -196,13 +197,6 @@ function pid(prefix, values) {
 			step: 'any'
 		}), ' '];
 	});
-}
-
-function formGroup(label, inputs) {
-	return h('.form-group', [
-		h('label.col-md-2.control-label', label),
-		h('.col-md-10.form-inline', inputs)
-	]);
 }
 
 module.exports = Config;

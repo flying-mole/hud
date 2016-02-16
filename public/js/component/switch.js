@@ -3,7 +3,13 @@
 var hg = require('mercury');
 var h = require('mercury').h;
 
+var nextId = 0;
+
 function Switch(id) {
+	if (!id) {
+		id = 'switch-' + (nextId++);
+	}
+
 	return hg.state({
 		id: id,
 		value: hg.value(false),
