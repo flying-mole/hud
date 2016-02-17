@@ -33,6 +33,14 @@ var awbs = [
 	'horizon'
 ];
 
+var meterings = [
+	'',
+	'average',
+	'spot',
+	'backlit',
+	'matrix'
+];
+
 function CameraProfile() {
 	return hg.state({
 		config: hg.value(),
@@ -104,17 +112,17 @@ CameraProfile.render = function (state) {
 		formGroup('Exposure', h('select.form-control', {
 			name: 'exposure'
 		}, exposures.map(function (item) {
-			return h('option', item);
+			return h('option', { selected: (state.config.exposure === item) }, item);
 		}))),
 		formGroup(h('abbr', { title: 'Automatic White Balance' }, 'AWB'), h('select.form-control', {
 			name: 'awb'
 		}, awbs.map(function (item) {
-			return h('option', item);
+			return h('option', { selected: (state.config.awb === item) }, item);
 		}))),
 		formGroup('Metering', h('select.form-control', {
 			name: 'metering'
 		}, meterings.map(function (item) {
-			return h('option', { value: item }, item || 'default');
+			return h('option', { value: item, selected: (state.config.metering === item) }, item || 'default');
 		})))
 	]);
 };
