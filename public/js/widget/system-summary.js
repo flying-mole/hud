@@ -6,7 +6,7 @@ var colors = require('../colors');
 
 function SystemSummary(quad) {
 	var state = hg.state({
-		loadavg: hg.value([]),
+		loadavg: hg.value([0, 0, 0]),
 		mem: hg.struct({ free: 0, total: 0 })
 	});
 
@@ -23,10 +23,7 @@ SystemSummary.render = function (state) {
 		return colors.toRgb(colors.shade(colors.getForPercentage(1 - ratio), -0.5));
 	}
 
-	var memRatio = 0;
-	if (state.mem) {
-		memRatio = state.mem.free / state.mem.total;
-	}
+	var memRatio = state.mem.free / state.mem.total || 0;
 
 	return h('p', [
 		h('span', ['Load average: '].concat(state.loadavg.map(function (avg) {
