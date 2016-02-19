@@ -23,6 +23,7 @@ function Outline(quad, url, motors, axis) {
 	if (motors) {
 		quad.on('motors-speed', function (speed) {
 			var propellers = state.svg.element.querySelector('#propellers');
+			if (!propellers) return;
 
 			speed.filter(function (s, i) {
 				return (motors.indexOf(i) !== -1);

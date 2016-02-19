@@ -218,22 +218,6 @@ function init(quad) {
 		rampInput.stop();
 	});
 
-	var cameraPreview = new CameraPreview(quad.cmd);
-	cameraPreview.on('start', function () {
-		$('#camera-video').html(cameraPreview.player.canvas);
-	});
-	cameraPreview.on('error', function (err) {
-		log(err, 'error');
-	});
-	$('#camera-play-btn').click(function () {
-		cameraPreview.play();
-	});
-	$('#camera-pause-btn').click(function () {
-		cameraPreview.pause();
-	});
-	$('#camera-stop-btn').click(function () {
-		cameraPreview.stop();
-	});
 	$('#camera-config-preview').submit(function () {
 		if (cameraPreview.isStarted()) {
 			setTimeout(function () {
