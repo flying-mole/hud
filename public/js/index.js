@@ -270,14 +270,5 @@ $(function () {
 		// PID controller config
 		$('#controller-btn').val(cfg.controller.updater);
 	});
-
-	quad.on('features', function (features) {
-		if (features.hardware.indexOf('camera') === -1) {
-			$('#camera').hide();
-		}
-	});
-
-	var cameraConfigHtml = $('#camera-config-inputs').html();
-	$('#camera-config-preview, #camera-config-record').html(cameraConfigHtml);
 });
 */
