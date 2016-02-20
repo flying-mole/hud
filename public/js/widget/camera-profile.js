@@ -71,6 +71,11 @@ function CameraProfile() {
 }
 
 function change(state, data) {
+	if (!state.isoSwitch.value()) {
+		delete data.ISO;
+	}
+	data.vstab = state.vstabSwitch.value();
+
 	console.log(data);
 }
 
