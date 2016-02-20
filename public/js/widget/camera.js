@@ -26,8 +26,11 @@ function Camera(quad) {
 		}
 	});
 
-	cameraPreview.on('start', function () {
-		state.video.set(cameraPreview.player.canvas);
+	cameraPreview.on('start', function (canvas) {
+		state.video.set(canvas);
+	});
+	cameraPreview.on('stop', function () {
+		state.video.set(null);
 	});
 	cameraPreview.on('error', function (err) {
 		console.error(err); // TODO: use UI console instead

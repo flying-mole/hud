@@ -78,7 +78,7 @@ CameraPreview.prototype.start = function () {
 	this._initPlayer();
 
 	this._startWebsocket(function () {
-		that.emit('start');
+		that.emit('start', that.player.canvas);
 	});
 
 	this._cmd.send('camera-preview', true);
@@ -91,6 +91,8 @@ CameraPreview.prototype.stop = function () {
 	//this.player.worker.terminate();
 
 	this._cmd.send('camera-preview', false);
+
+	this.emit('stop');
 };
 
 CameraPreview.prototype.restart = function () {

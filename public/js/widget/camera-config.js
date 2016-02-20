@@ -49,10 +49,4 @@ CameraConfig.render = function (state) {
 	]);
 };
 
-function renderProfile(state) {
-	if (!state) return h();
-
-
-}
-
 module.exports = CameraConfig;
