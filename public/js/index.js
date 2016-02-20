@@ -59,10 +59,15 @@ function App() {
 		calibrateBtn: CalibrateBtn(quad),
 		charts: Charts(quad),
 		camera: Camera(quad),
+		cameraAvailable: hg.value(false),
 		config: Config(quad)
 	});
 
 	quad.init();
+
+	quad.on('features', function (features) {
+		state.cameraAvailable.set(features.hardware.indexOf('camera') !== -1);
+	});
 
 	return state;
 }
@@ -120,7 +125,9 @@ App.render = function (state) {
 		])),
 		h('.container-fluid', hg.partial(Charts.render, state.charts)),
 
-		h('#camera', [
+		h('#camera', {
+			style: { display: (state.cameraAvailable) ? 'block' : 'none' }
+		}, [
 			h('hr'),
 			h('.container-fluid', hg.partial(Camera.render, state.camera))
 		]),
@@ -134,25 +141,7 @@ App.render = function (state) {
 
 hg.app(document.body, App(), App.render);
 
-/*var SVGInjector = require('svg-injector');
-var smoothie = require('smoothie');
-var colors = require('./colors');
-var keyBindings = require('./key-bindings');
-var graphsExport = require('./graphs-export');
-var CameraPreview = require('./camera-preview');
-var QuadcopterSchema = require('./quad-schema');
-var Quadcopter = require('./quadcopter');
-
-var input = {
-	Mouse: require('./input/mouse'),
-	DeviceOrientation: require('./input/device-orientation'),
-	Gamepad: require('./input/gamepad'),
-	Step: require('./input/step'),
-	Sine: require('./input/sine'),
-	Ramp: require('./input/ramp')
-};
-
-function init(quad) {
+/*function init(quad) {
 	keyBindings(quad);
 
 	var mouseInput = new input.Mouse(quad.cmd, '#direction-input');
@@ -171,52 +160,6 @@ function init(quad) {
 	if (input.Gamepad.isSupported()) {
 		var gamepadInput = new input.Gamepad(quad.cmd);
 	}
-
-	$('#direction-type-tabs').tabs();
-
-	var stepInput = new input.Step(quad.cmd);
-	$('#direction-step').submit(function (event) {
-		event.preventDefault();
-
-		var data = $(this).serializeObject();
-
-		stepInput.start({
-			x: parseFloat(data.x),
-			y: parseFloat(data.y),
-			z: parseFloat(data.z),
-			duration: parseFloat(data.duration) * 1000
-		});
-	});
-
-	var sineInput = new input.Sine(quad.cmd);
-	$('#direction-sine').submit(function (event) {
-		event.preventDefault();
-
-		var data = $(this).serializeObject();
-
-		sineInput.start({
-			amplitude: parseFloat(data.amplitude),
-			frequency: parseFloat(data.frequency),
-			offset: parseFloat(data.offset),
-			axis: data.axis
-		});
-	});
-	$('#direction-sine-stop').click(function () {
-		sineInput.stop();
-	});
-
-	var rampInput = new input.Ramp(quad.cmd);
-	$('#direction-ramp').submit(function (event) {
-		event.preventDefault();
-
-		var data = $(this).serializeObject();
-		data.slope = parseFloat(data.slope);
-
-		rampInput.start(data);
-	});
-	$('#direction-ramp-stop').click(function () {
-		rampInput.stop();
-	});
 
 	$('#camera-config-preview').submit(function () {
 		if (cameraPreview.isStarted()) {
