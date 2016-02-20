@@ -144,23 +144,6 @@ hg.app(document.body, App(), App.render);
 /*function init(quad) {
 	keyBindings(quad);
 
-	var mouseInput = new input.Mouse(quad.cmd, '#direction-input');
-
-	if (input.Gamepad.isSupported()) {
-		var devOrientation = new input.Gamepad(quad.cmd);
-
-		$('#orientation-switch').change(function () {
-			if ($(this).prop('checked')) {
-				devOrientation.start();
-			} else {
-				devOrientation.stop();
-			}
-		});
-	}
-	if (input.Gamepad.isSupported()) {
-		var gamepadInput = new input.Gamepad(quad.cmd);
-	}
-
 	$('#camera-config-preview').submit(function () {
 		if (cameraPreview.isStarted()) {
 			setTimeout(function () {

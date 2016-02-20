@@ -12,6 +12,7 @@ function Camera(quad) {
 	var state = hg.state({
 		config: CameraConfig(quad),
 		video: hg.value(),
+		recording: hg.value(false),
 		channels: {
 			play: function () {
 				cameraPreview.play();
@@ -22,7 +23,11 @@ function Camera(quad) {
 			stop: function () {
 				cameraPreview.stop();
 			},
-			record: function () {}
+			record: function () {
+				var recording = !state.recording();
+				state.recording.set(recording);
+				quad.cmd.send('camera-record', recording);
+			}
 		}
 	});
 
@@ -52,7 +57,7 @@ Camera.render = function (state) {
 					h('button.btn.btn-default', {
 						'ev-click': hg.sendClick(state.channels.pause)
 					}, h('span.glyphicon.glyphicon-pause')),
-					h('button.btn.btn-default', {
+					h('button.btn.btn-default' + ((state.recording) ? '.active' : ''), {
 						'ev-click': hg.sendClick(state.channels.stop)
 					}, h('span.glyphicon.glyphicon-stop'))
 				]),
@@ -62,7 +67,7 @@ Camera.render = function (state) {
 					'ev-click': hg.sendClick(state.channels.record)
 				}, h('span.glyphicon.glyphicon-record')),
 				h('br'),
-				h('p.text-danger', { style: { display: 'none' } }, 'Recording...')
+				h('p.text-danger', { style: { display: (state.recording) ? 'block' : 'none' } }, 'Recording...')
 			])
 		]),
 	]);
