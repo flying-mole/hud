@@ -19,6 +19,7 @@ var Outline = require('./widget/outline');
 var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
 var CalibrateBtn = require('./widget/calibrate-btn');
+var ChartRecorder = require('./widget/chart-recorder');
 var Camera = require('./widget/camera');
 var Config = require('./widget/config');
 
@@ -57,6 +58,7 @@ function App() {
 		motorsSummary: MotorsSummary(quad),
 		orientationSummary: OrientationSummary(quad),
 		calibrateBtn: CalibrateBtn(quad),
+		chartRecorder: ChartRecorder(quad),
 		charts: Charts(quad),
 		camera: Camera(quad),
 		cameraAvailable: hg.value(false),
@@ -120,7 +122,9 @@ App.render = function (state) {
 				hg.partial(Outline.Front.render, state.outline.front),
 				hg.partial(Outline.Right.render, state.outline.right),
 				hg.partial(OrientationSummary.render, state.orientationSummary),
-				hg.partial(CalibrateBtn.render, state.calibrateBtn)
+				hg.partial(CalibrateBtn.render, state.calibrateBtn),
+				' ',
+				hg.partial(ChartRecorder.render, state.chartRecorder)
 			]),
 		])),
 		h('.container-fluid', hg.partial(Charts.render, state.charts)),
