@@ -5,44 +5,59 @@ var exportFile = require('./export');
 
 module.exports = function (quad) {
 	var isRecording = false;
-	var header = [];
+	var startedAt = 0;
+	var header = ['time'];
 	var lines = [];
 
-	var firstOrientation = true;
-	function appendOrientation(data) {
-		data = flatten(data);
+	function createAppender(prefix) {
+		var isFirst = true;
 
-		if (firstOrientation) {
-			firstOrientation = false;
-			header = header.concat(Object.keys(data));
+		function newline() {
+			var line = new Array(header.length);
+			line[0] = (Date.now() - startedAt) / 1000;
+			lines.push(line);
+			return line;
 		}
 
-		var line = new Array(header.length);
-		for (var i = 0; i < header.length; i++) {
-			var key = header[i];
-
-			if (typeof data[key] === 'undefined') {
-				continue;
+		return function append(data) {
+			if (prefix) {
+				data = { [prefix]: data };
 			}
 
-			line[i] = data[key];
-		}
-		lines.push(line);
+			data = flatten(data);
+
+			if (isFirst) {
+				isFirst = false;
+				header = header.concat(Object.keys(data));
+			}
+
+			var line = lines[lines.length - 1] || newline();
+			for (var i = 0; i < header.length; i++) {
+				var key = header[i];
+
+				if (typeof data[key] === 'undefined') {
+					continue;
+				}
+
+				if (typeof line[i] !== 'undefined') {
+					line = newline();
+				}
+
+				line[i] = data[key];
+			}
+		};
 	}
 
-	function appendMotorsSpeed(data) {
-		// TODO
-	}
-
-	function appendCmd(data) {
-		// TODO
-	}
+	var appendOrientation = createAppender();
+	var appendMotorsSpeed = createAppender('motorsSpeed');
+	var appendCmd = createAppender('cmd');
 
 	return {
 		start: function () {
 			if (isRecording) return;
 
 			this.reset();
+			startedAt = Date.now();
 
 			quad.on('orientation', appendOrientation);
 			quad.on('motors-speed', appendMotorsSpeed);

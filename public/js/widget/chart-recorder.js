@@ -28,23 +28,24 @@ function ChartRecorder(quad) {
 }
 
 ChartRecorder.render = function (state) {
-	return h('.btn-group', [
-		h('button.btn.btn-danger', {
+	var recordBtn;
+	if (!state.recording) {
+		recordBtn = h('button.btn.btn-danger', {
 			title: 'Record',
-			style: { display: (!state.recording) ? 'block' : 'none' },
 			'ev-click': hg.sendClick(state.channels.start)
-		}, h('span.glyphicon.glyphicon-record')),
-		h('button.btn.btn-danger', {
+		}, h('span.glyphicon.glyphicon-record'));
+	} else {
+		recordBtn = h('button.btn.btn-danger', {
 			title: 'Stop recording',
-			style: { display: (state.recording) ? 'block' : 'none' },
 			'ev-click': hg.sendClick(state.channels.stop)
-		}, h('span.glyphicon.glyphicon-stop')),
+		}, h('span.glyphicon.glyphicon-stop'));
+	}
+
+	return h('.btn-group', [
+		recordBtn,
 		h('button.btn.btn-default', {
 			'ev-click': hg.sendClick(state.channels.export)
-		}, 'Export'),
-		h('p.text-danger', {
-			style: { display: (state.recording) ? 'block' : 'none' }
-		}, 'Recording...')
+		}, 'Export')
 	]);
 };
 
