@@ -77,7 +77,10 @@ module.exports = function (quad) {
 			var csv = header.join(',') + '\n';
 
 			for (var i = 0; i < lines.length; i++) {
-				csv += lines[i].join(',') + '\n';
+				csv += lines[i].map(function (val) {
+					if (typeof val === 'undefined') return '';
+					return val;
+				}).join(',') + '\n';
 			}
 
 			return exportFile({ body: csv, type: 'text/csv' });
