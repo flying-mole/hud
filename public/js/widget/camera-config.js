@@ -22,16 +22,13 @@ function CameraConfig(quad) {
 		state.profiles.preview.config.set(config.camera.preview);
 		state.profiles.record.config.set(config.camera.record);
 	});
-
-	quad.cmd.on('config', function (config) {
-		if (!config.camera) return;
-
-		if (config.camera.preview) {
-			state.profiles.preview.config.set(extend(state.config.preview(), config.camera.preview));
-		}
-		if (config.camera.record) {
-			state.profiles.record.config.set(extend(state.config.record(), config.camera.record));
-		}
+	quad.once('config', function (config) {
+		state.profiles.preview.config(function (config) {
+			quad.setConfig({ camera: { preview: config } });
+		});
+		state.profiles.record.config(function (config) {
+			quad.setConfig({ camera: { record: config } });
+		});
 	});
 
 	return state;

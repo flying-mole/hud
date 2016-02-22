@@ -2,6 +2,7 @@
 
 var hg = require('mercury');
 var h = require('mercury').h;
+var extend = require('extend');
 var Switch = require('../component/switch');
 var formGroup = require('../component/form-group');
 
@@ -42,7 +43,7 @@ var meterings = [
 ];
 
 var drcs = [
-	'off',
+	'',
 	'low',
 	'medium',
 	'high'
@@ -71,12 +72,24 @@ function CameraProfile() {
 }
 
 function change(state, data) {
+	delete data.value; // TODO
+
 	if (!state.isoSwitch.value()) {
 		delete data.ISO;
 	}
 	data.vstab = state.vstabSwitch.value();
 
-	console.log(data);
+	var current = state.config();
+	for (var key in current) {
+		if (typeof current[key] === 'number') {
+			data[key] = parseFloat(data[key]) || 0;
+		}
+		if (data[key] === '') {
+			data[key] = null;
+		}
+	}
+
+	state.config.set(extend({}, current, data));
 }
 
 CameraProfile.render = function (state) {
@@ -150,7 +163,7 @@ CameraProfile.render = function (state) {
 		formGroup(h('abbr', { title: 'Dynamic Range Compression' }, 'DRC'), h('select.form-control', {
 			name: 'drc'
 		}, drcs.map(function (item) {
-			return h('option', { selected: (state.config.drc === item) }, item);
+			return h('option', { value: item, selected: (state.config.drc === item) }, item || 'off');
 		}))),
 		formGroup('Mode', h('select.form-control', {
 			name: 'mode'

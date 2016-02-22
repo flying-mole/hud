@@ -62,9 +62,8 @@ module.exports = {
 			"vflip": false,
 			"shutter": null,
 			"drc": null,
-			"mode": 1,
+			"mode": 0,
 			"bitrate": null,
-
 			"width": 400,
 			"height": 400,
 			"framerate": 10,
