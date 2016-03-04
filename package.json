@@ -40,6 +40,7 @@
     "servoblaster": "^0.1.0",
     "smoothie": "^1.27.0",
     "stream-split": "^0.2.0",
+    "throttle-function": "^0.1.0",
     "through": "^2.3.8",
     "util": "^0.10.3"
   }

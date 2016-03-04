@@ -23,6 +23,7 @@ var ChartRecorder = require('./widget/chart-recorder');
 var Camera = require('./widget/camera');
 var Config = require('./widget/config');
 
+var DirectionSender = require('./direction-sender');
 var MouseDirection = require('./direction/mouse');
 var DeviceOrientationDirection = require('./direction/device-orientation');
 var GamepadDirection = require('./direction/gamepad');
@@ -70,6 +71,9 @@ function App() {
 	quad.on('features', function (features) {
 		state.cameraAvailable.set(features.hardware.indexOf('camera') !== -1);
 	});
+
+	var sender = DirectionSender(quad.cmd);
+	sender(state.direction.mouse);
 
 	return state;
 }
