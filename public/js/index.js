@@ -73,7 +73,9 @@ function App() {
 	});
 
 	var sender = DirectionSender(quad.cmd);
-	sender(state.direction.mouse);
+	['mouse', 'deviceOrientation', 'gamepad', 'step', 'sine', 'ramp'].forEach(function (key) {
+		sender(state.direction[key]);
+	});
 
 	return state;
 }

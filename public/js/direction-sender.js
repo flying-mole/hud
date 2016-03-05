@@ -1,4 +1,4 @@
-var throttle = require('throttle-function');
+var throttle = require('throttleit');
 
 module.exports = function (cmd) {
 	return function (state) {
@@ -7,7 +7,6 @@ module.exports = function (cmd) {
 		}
 
 		function update() {
-			console.log('update');
 			cmd.send('orientation', {
 				x: state.x(),
 				y: state.y(),
