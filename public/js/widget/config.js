@@ -13,7 +13,7 @@ function Config(quad) {
 		channels: {
 			change: function (state, data) {
 				data = cast(state.config(), expand(data));
-				console.log('change', data); // TODO
+				quad.cmd.send('config', data);
 			},
 			export: function (state) {
 				exportFile({
@@ -36,15 +36,20 @@ function Config(quad) {
 }
 
 function cast(from, to) {
-	for (var name in to) {
-		if (typeof from[name] === 'object') {
-			to[name] = cast(from[name], to[name]);
-		} else if (typeof from[name] == 'number') {
-			if (typeof to[name] === 'string') {
-				to[name] = parseFloat(to[name]);
-			}
+	if (from instanceof Array) {
+		to = Object.keys(to).map(function (key, i) {
+			return cast(from[i], to[key]);
+		});
+	} else if (typeof from === 'object') {
+		for (var key in to) {
+			to[key] = cast(from[key], to[key]);
+		}
+	} else if (typeof from === 'number') {
+		if (typeof to === 'string') {
+			to = parseFloat(to);
 		}
 	}
+
 	return to;
 }
 
