@@ -24,7 +24,7 @@ Related blog (in French): http://emersion.fr/blog
 
 ## Setup
 
-The HUD will work on the Raspberry Pi as well as on your desktop/laptop, even if sensors/motors/camera are not available. It requires Node >= 4.0.
+The HUD will work on the Raspberry Pi as well as on your desktop/laptop, even if sensors/motors/camera are not available. It requires Node >= 4.0. A [full setup guide](https://github.com/flying-mole/docs/blob/master/setup/install.md) is available.
 
 Install dependencies:
 ```
