@@ -27,7 +27,7 @@ function ControllerBtn(quad) {
 }
 
 ControllerBtn.render = function (state) {
-	return h('div.form-inline', [
+	return h('.form-inline', [
 		h('label.control-label', { htmlFor: 'controller-btn' }, 'Controller:'),
 		h('select#controller-btn.form-control', {
 			name: 'controller',

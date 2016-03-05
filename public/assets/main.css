@@ -121,7 +121,17 @@ input[type="number"].form-control {
 	opacity: 0.2;
 	pointer-events: none;
 }
-.direction-mouse:active .handle {
+.direction-mouse .handle .tooltip {
+	width: 100px;
+	top: -35px;
+	left: -42px;
+}
+.direction-mouse:active .handle,
+.direction-mouse.active .handle {
+	opacity: 1;
+}
+.direction-mouse:active .handle .tooltip,
+.direction-mouse.active .handle .tooltip {
 	opacity: 1;
 }
 

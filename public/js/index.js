@@ -14,7 +14,6 @@ var ControllerBtn = require('./widget/controller-btn');
 var SystemSummary = require('./widget/system-summary');
 var Charts = require('./widget/charts');
 var PowerInput = require('./widget/power-input');
-var RotationInput = require('./widget/rotation-input');
 var Outline = require('./widget/outline');
 var MotorsSummary = require('./widget/motors-summary');
 var OrientationSummary = require('./widget/orientation-summary');
@@ -40,7 +39,7 @@ function App() {
 		enableBtn: EnableBtn(quad),
 		controllerBtn: ControllerBtn(quad),
 		systemSummary: SystemSummary(quad),
-		directionTabs: Tabs(['custom', 'step', 'sine', 'ramp']),
+		directionTabs: Tabs(['mouse', 'device', 'step', 'sine', 'ramp']),
 		direction: hg.struct({
 			mouse: MouseDirection(),
 			deviceOrientation: DeviceOrientationDirection(),
@@ -50,7 +49,6 @@ function App() {
 			ramp: RampDirection()
 		}),
 		powerInput: PowerInput(quad),
-		rotationInput: RotationInput(quad),
 		outline: hg.struct({
 			top: Outline.Top(quad),
 			front: Outline.Front(quad),
@@ -97,13 +95,15 @@ App.render = function (state) {
 
 		h('hr'),
 		h('.container-fluid', h('.row', [
-			h('.col-lg-3.col-xs-6.text-center', [ // .hidden-xs.hidden-sm
+			h('.col-lg-4.col-xs-9.text-center', [
 				h('div', [
 					h('strong', 'Direction'),
 					hg.partial(Tabs.render, state.directionTabs)
 				]),
-				Tabs.renderContainer(state.directionTabs, 'custom', [
-					hg.partial(MouseDirection.render, state.direction.mouse),
+				Tabs.renderContainer(state.directionTabs, 'mouse', [ // .hidden-xs.hidden-sm
+					hg.partial(MouseDirection.render, state.direction.mouse)
+				]),
+				Tabs.renderContainer(state.directionTabs, 'device', [
 					hg.partial(DeviceOrientationDirection.render, state.direction.deviceOrientation),
 					hg.partial(GamepadDirection.render, state.direction.gamepad)
 				]),
@@ -117,8 +117,7 @@ App.render = function (state) {
 					hg.partial(RampDirection.render, state.direction.ramp)
 				])
 			]),
-			h('.col-lg-2.col-sm-3.col-xs-6.text-center', hg.partial(PowerInput.render, state.powerInput)),
-			h('.col-lg-1.col-sm-3.col-xs-6.text-center', hg.partial(RotationInput.render, state.rotationInput)),
+			h('.col-lg-2.col-xs-3.text-center', hg.partial(PowerInput.render, state.powerInput)),
 			h('span.clearfix.visible-sm'),
 			h('.col-lg-3.col-sm-6.col-xs-12.text-center', [
 				hg.partial(Outline.Top.render, state.outline.top),
