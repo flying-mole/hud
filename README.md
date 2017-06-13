@@ -14,7 +14,7 @@ Features:
 * Live editing of all config entries
 * Record & export sensors data (as CSV)
 
-Related blog (in French): http://emersion.fr/blog
+Related blog (in French): https://emersion.fr/tags/quadcopter/
 
 ## Screenshots
 
